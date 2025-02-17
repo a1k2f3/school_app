@@ -49,7 +49,7 @@ class _LengthConverterState extends State<Mainhomepage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: ('settings'),
+            label: ('profile'),
           ),
         ],
         currentIndex: _selectedIndex,
