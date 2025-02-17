@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => const SecondPage()),
                   );
                 },
-                child: const Text('Go to Second Page'),
+                child: const Text('Continue'),
               ),
             ],
           ),

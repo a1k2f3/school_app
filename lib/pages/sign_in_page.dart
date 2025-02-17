@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:school_app/pages/mainhomepage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -41,6 +42,7 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Login Successful")),
         );
+       Navigator.push(context,MaterialPageRoute(builder:(context)=> Mainhomepage() ));
       });
     }
   }
