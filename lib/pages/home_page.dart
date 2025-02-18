@@ -13,12 +13,13 @@ class HomePage extends StatelessWidget {
           margin: const EdgeInsets.all(20),
           padding: const EdgeInsets.all(15),
           decoration: BoxDecoration(
-            color: Colors.blue,
+            color: const Color.fromARGB(255, 243, 245, 247),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              
               const Text(
                 'Welcome to Home Page',
                 style: TextStyle(color: Colors.white, fontSize: 18),
