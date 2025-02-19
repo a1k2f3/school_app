@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:school_app/pages/profile.dart';
+import 'package:school_app/pages/settings.dart';
 
 class Mainhomepage extends StatefulWidget {
   @override
@@ -20,6 +21,9 @@ class _LengthConverterState extends State<Mainhomepage> {
       Navigator.push(context, MaterialPageRoute(builder: (context) => Mainhomepage()));
     } else if(index == 2){
       Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
+    }
+    else if(index == 1){
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
     }
   }
 
@@ -200,26 +204,36 @@ class _LengthConverterState extends State<Mainhomepage> {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.white),
-            label: 'Home',
+        bottomNavigationBar: Container(
+        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.blueAccent,
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              
+              blurRadius: 10,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(30),
+          child: BottomNavigationBar(
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.settings), label: 'Settings'),
+              BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+            ],
+            currentIndex: _selectedIndex,
+            selectedItemColor: Colors.amber[800],
+            onTap: _onItemTapped,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            unselectedItemColor: Colors.white70,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings, color: Colors.white),
-            label: 'Settings',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.white),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.amber[800],
-        onTap: _onItemTapped,
-        backgroundColor: Colors.blueAccent,
-      ),
+        ))
     );
   }
 }
