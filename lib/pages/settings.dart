@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:school_app/pages/Security.dart';
+import 'package:school_app/pages/cusomize.dart';
+import 'package:school_app/pages/help_support.dart';
+import 'package:school_app/pages/notification.dart';
 import 'package:school_app/pages/profile.dart';
 import 'package:school_app/pages/mainhomepage.dart';
+import 'package:school_app/pages/second_page.dart';
 
 class Settings extends StatefulWidget {
   @override
@@ -32,11 +37,7 @@ class _SettingsState extends State<Settings> {
               // Profile Card with gradient background
               Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.blueAccent, Colors.purpleAccent],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
@@ -73,29 +74,26 @@ class _SettingsState extends State<Settings> {
               SizedBox(height: 20),
 
               // Settings Options List
-              _buildSettingOption(Icons.person, "Profile Setting", () {}),
-              _buildSettingOption(Icons.lock, "Account & Security", () {}),
+              _buildSettingOption(Icons.person, "Profile Setting", () {Navigator.push(context, MaterialPageRoute(builder: (context) =>  Profile()));}),
+              _buildSettingOption(Icons.lock, "Account & Security", () { Navigator.push(context, MaterialPageRoute(builder: (context) =>  AccountSecurityApp()));}),
               _buildSettingOption(
-                  Icons.notifications, "Notification Preferences", () {}),
-              _buildSettingOption(Icons.update, "Theme & Customization", () {}),
+                  Icons.notifications, "Notification Preferences", () { Navigator.push(context, MaterialPageRoute(builder: (context) =>  NotificationPreferenceApp()));}),
+              _buildSettingOption(Icons.update, "Theme & Customization", () { Navigator.push(context, MaterialPageRoute(builder: (context) =>  SchoolApp()));}),
               _buildSettingOption(Icons.logout, "Logout & Account Management",
                   () {
-                // Implement logout functionality
+                Navigator.push(context, MaterialPageRoute(builder: (context) =>   SecondPage()));
               }),
             ],
           ),
         ),
       ),
-
-      // Floating Bottom Navigation Bar
       bottomNavigationBar: Container(
         margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.blueAccent,
           borderRadius: BorderRadius.circular(30),
           boxShadow: [
-            BoxShadow(
-              
+            BoxShadow(             
               blurRadius: 10,
               spreadRadius: 2,
             ),

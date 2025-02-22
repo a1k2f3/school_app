@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:school_app/pages/attendence.dart';
+import 'package:school_app/pages/dairy.dart';
+import 'package:school_app/pages/fee_status.dart';
+import 'package:school_app/pages/result.dart';
+import 'package:school_app/pages/second_page.dart';
+import 'package:school_app/pages/settings.dart';
+import 'package:school_app/pages/subject.dart';
+import 'package:school_app/pages/timetable.dart';
 
 class Profile extends StatelessWidget {
   @override
@@ -62,20 +70,20 @@ class Profile extends StatelessWidget {
               ),
             ),
             SizedBox(height: 20),
-
             // ERP Portal Options
             Expanded(
               child: ListView(
                 children: [
-                  buildListTile(Icons.calendar_today, "Attendance", context),
-                  buildListTile(Icons.school, "Grades & Results", context),
-                  buildListTile(Icons.access_time, "Timetable", context),
-                  buildListTile(Icons.book, "Courses & Subjects", context),
-                  buildListTile(Icons.payment, "Fee Status", context),
-                  buildListTile(Icons.assignment, "Dairy", context),        
+                  buildNavigationListTile(context,Icons.calendar_today, Colors.black,"Attendance",Attendence()),
+                  buildNavigationListTile(context,Icons.school,Colors.black,"Grades & Results",StudentResultPage()),
+                  buildNavigationListTile( context,Icons.access_time,Colors.black, "Timetable",Timetable()),
+                  buildNavigationListTile(context,Icons.book,Colors.black, "Courses & Subjects",Subject()),
+                  buildNavigationListTile(context,Icons.payment,Colors.black, "Fee Status",FeeStatusComponent()),
+                  buildNavigationListTile(context,Icons.assignment,Colors.black, "Dairy",DiaryViewComponent() ),        
                   Divider(),
-                  buildListTile(Icons.settings,  "Settings", context),
-                  buildListTile(Icons.logout, "Log out", context, iconColor: Colors.red),
+                 buildNavigationListTile(context,Icons.settings,Colors.black,
+                 "Settings",Settings() ),
+                  buildNavigationListTile(context,Icons.logout, Colors.red, "Log out",SecondPage() ),
                 ],
               ),
             ),
@@ -84,16 +92,25 @@ class Profile extends StatelessWidget {
       ),
     );
   }
-
   // Helper function for creating ListTiles
-  Widget buildListTile(IconData icon, String title, BuildContext context, {Color iconColor = Colors.black}) {
-    return ListTile(
-      leading: Icon(icon, color: iconColor),
-      title: Text(title, style: TextStyle(fontSize: 16)),
-      trailing: Icon(Icons.arrow_forward_ios, size: 16),
-      onTap: () {
-        // Implement navigation logic here
-      },
-    );
-  }
+  ListTile buildNavigationListTile(
+    BuildContext context,
+    IconData icon,
+    Color iconColor,
+    String title,
+    Widget destinationPage,
+  ) {
+  return ListTile(
+    leading: Icon(icon, color: iconColor),
+    title: Text(title, style: TextStyle(fontSize: 16)),
+    trailing: Icon(Icons.arrow_forward_ios, size: 16),
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => destinationPage),
+      );
+    },
+  );
+}
+
 }

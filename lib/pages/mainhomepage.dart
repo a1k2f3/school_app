@@ -1,7 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:school_app/pages/course.dart';
+import 'package:school_app/pages/help_support.dart';
 import 'package:school_app/pages/profile.dart';
 import 'package:school_app/pages/settings.dart';
+import 'package:school_app/pages/upcomming_event.dart';
 
 class Mainhomepage extends StatefulWidget {
   @override
@@ -105,6 +108,8 @@ class _LengthConverterState extends State<Mainhomepage> {
                   title: Text("General Science", style: TextStyle(fontSize: 18, color: Colors.black)),
                   trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue),
                   onTap: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => CoursePage()));
+   
                     // Implement your navigation logic
                   },
                 ),
@@ -120,6 +125,8 @@ class _LengthConverterState extends State<Mainhomepage> {
                   title: Text("Social Studies", style: TextStyle(fontSize: 18, color: Colors.black)),
                   trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue),
                   onTap: () {
+                     Navigator.push(context, MaterialPageRoute(builder: (context) => CoursePage()));
+   
                     // Implement your navigation logic
                   },
                 ),
@@ -135,6 +142,8 @@ class _LengthConverterState extends State<Mainhomepage> {
                   title: Text("Islamiat", style: TextStyle(fontSize: 18, color: Colors.black)),
                   trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue),
                   onTap: () {
+                     Navigator.push(context, MaterialPageRoute(builder: (context) => CoursePage()));
+   
                     // Implement your navigation logic
                   },
                 ),
@@ -151,6 +160,8 @@ class _LengthConverterState extends State<Mainhomepage> {
                   title: Text("Computer", style: TextStyle(fontSize: 18, color: Colors.black)),
                   trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue),
                   onTap: () {
+                     Navigator.push(context, MaterialPageRoute(builder: (context) => CoursePage()));
+   
                     // Implement your navigation logic
                   },
                 ),
@@ -166,7 +177,8 @@ class _LengthConverterState extends State<Mainhomepage> {
                   title: Text("Upcomig Evants", style: TextStyle(fontSize: 18, color: Colors.black)),
                   trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue),
                   onTap: () {
-                    // Implement your navigation logic
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => UpcomingEventApp()));
+   
                   },
                 ),
               ),
@@ -182,6 +194,7 @@ class _LengthConverterState extends State<Mainhomepage> {
                   trailing: Icon(Icons.arrow_forward_ios, color: Colors.blue),
                   onTap: () {
                     // Implement your navigation logic
+                    Navigator.push(context, MaterialPageRoute(builder: (context) =>  HelpSupportApp()));
                   },
                 ),
               ),
