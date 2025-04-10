@@ -160,7 +160,7 @@ class _AssignClassesState extends State<AssignClasses> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Assign Classes"),
+        title: const Text("AssClasses"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
