@@ -8,12 +8,14 @@ import 'package:school_app/pages/mainhomepage.dart';
 import 'package:school_app/pages/second_page.dart';
 
 class Settings extends StatefulWidget {
+  const Settings({super.key});
+
   @override
   _SettingsState createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
-  int _selectedIndex = 1; // Set default to settings
+  final int _selectedIndex = 1; // Set default to settings
 
   void _onItemTapped(int index) {
     if (index == 0) {

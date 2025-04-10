@@ -5,6 +5,8 @@ void main() {
 }
 
 class UpcomingEventApp extends StatelessWidget {
+  const UpcomingEventApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -43,6 +45,8 @@ class UpcomingEventPage extends StatelessWidget {
     ),
   ];
 
+  UpcomingEventPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,7 +83,7 @@ class Event {
 class EventCard extends StatelessWidget {
   final Event event;
 
-  const EventCard({Key? key, required this.event}) : super(key: key);
+  const EventCard({super.key, required this.event});
 
   @override
   Widget build(BuildContext context) {

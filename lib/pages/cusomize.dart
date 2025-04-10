@@ -5,6 +5,8 @@ void main() {
 }
 
 class SchoolApp extends StatefulWidget {
+  const SchoolApp({super.key});
+
   @override
   _SchoolAppState createState() => _SchoolAppState();
 }
@@ -54,7 +56,7 @@ class ThemeCustomizationPage extends StatefulWidget {
   final double textScaleFactor;
   final Function(Color, bool, double) onThemeChanged;
 
-  ThemeCustomizationPage({
+  const ThemeCustomizationPage({super.key, 
     required this.primaryColor,
     required this.isDarkMode,
     required this.textScaleFactor,

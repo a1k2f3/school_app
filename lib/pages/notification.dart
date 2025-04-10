@@ -5,6 +5,8 @@ void main() {
 }
 
 class NotificationPreferenceApp extends StatelessWidget {
+  const NotificationPreferenceApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,6 +20,8 @@ class NotificationPreferenceApp extends StatelessWidget {
 }
 
 class NotificationPreferencePage extends StatefulWidget {
+  const NotificationPreferencePage({super.key});
+
   @override
   _NotificationPreferencePageState createState() =>
       _NotificationPreferencePageState();

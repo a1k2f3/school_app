@@ -5,6 +5,8 @@ void main() {
 }
 
 class AccountSecurityApp extends StatelessWidget {
+  const AccountSecurityApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,6 +20,8 @@ class AccountSecurityApp extends StatelessWidget {
 }
 
 class AccountSecurityPage extends StatefulWidget {
+  const AccountSecurityPage({super.key});
+
   @override
   _AccountSecurityPageState createState() => _AccountSecurityPageState();
 }

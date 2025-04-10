@@ -5,6 +5,8 @@ void main() {
 }
 
 class Attendence extends StatelessWidget {
+  const Attendence({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,6 +35,8 @@ class StudentAttendancePage extends StatelessWidget {
     AttendanceRecord(date: DateTime(2025, 2, 24), isPresent: true),
     // Add more records as needed.
   ];
+
+  StudentAttendancePage({super.key});
 
   @override
   Widget build(BuildContext context) {

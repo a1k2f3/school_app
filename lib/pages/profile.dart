@@ -9,6 +9,8 @@ import 'package:school_app/pages/subject.dart';
 import 'package:school_app/pages/timetable.dart';
 
 class Profile extends StatelessWidget {
+  const Profile({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

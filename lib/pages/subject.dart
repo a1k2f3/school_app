@@ -4,6 +4,8 @@ void main() {
   runApp(Subject());
 }
 class Subject extends StatelessWidget {
+  const Subject({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -40,6 +42,8 @@ class UserCoursesPage extends StatelessWidget {
       imageUrl: 'https://images.theconversation.com/files/45159/original/rptgtpxd-1396254731.jpg?ixlib=rb-4.1.0&q=45&auto=format&w=754&fit=clip',
     ),
   ];
+
+  UserCoursesPage({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -5,6 +5,8 @@ void main() {
 }
 
 class StudentResultApp extends StatelessWidget {
+  const StudentResultApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -39,6 +41,8 @@ class StudentResultPage extends StatelessWidget {
     GradeRecord(subject: 'History', grade: 'B', score: 85),
     GradeRecord(subject: 'Computer Science', grade: 'A', score: 97),
   ];
+
+  StudentResultPage({super.key});
 
   // Function to calculate overall average score.
   double calculateAverageScore() {

@@ -7,6 +7,8 @@ import 'package:school_app/pages/settings.dart';
 import 'package:school_app/pages/upcomming_event.dart';
 
 class Mainhomepage extends StatefulWidget {
+  const Mainhomepage({super.key});
+
   @override
   _LengthConverterState createState() => _LengthConverterState();
 }

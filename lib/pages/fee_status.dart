@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class FeeStatusComponent extends StatefulWidget {
+  const FeeStatusComponent({super.key});
+
   @override
   _FeeStatusComponentState createState() => _FeeStatusComponentState();
 }

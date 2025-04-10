@@ -5,6 +5,8 @@ void main() {
 }
 
 class HelpSupportApp extends StatelessWidget {
+  const HelpSupportApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,7 +20,7 @@ class HelpSupportApp extends StatelessWidget {
 }
 
 class HelpSupportPage extends StatelessWidget {
-  const HelpSupportPage({Key? key}) : super(key: key);
+  const HelpSupportPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -109,6 +111,8 @@ class FAQSection extends StatelessWidget {
     // Add more FAQ items as needed.
   ];
 
+   FAQSection({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -153,9 +157,11 @@ class SupportArticlesSection extends StatelessWidget {
     // Add more articles as needed.
   ];
 
+  SupportArticlesSection({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 170,
       // Horizontal scrolling list for articles.
       child: ListView.builder(
@@ -209,6 +215,8 @@ class Article {
 
 // Contact Form Section using a stateful widget with a form.
 class ContactFormSection extends StatefulWidget {
+  const ContactFormSection({super.key});
+
   @override
   _ContactFormSectionState createState() => _ContactFormSectionState();
 }
