@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class AdminPanelPage extends StatelessWidget {
@@ -110,19 +111,104 @@ class AssignCoursesPage extends StatelessWidget {
     );
   }
 }
-class AssignClasses extends StatelessWidget {
+class AssignClasses extends StatefulWidget {
   const AssignClasses({super.key});
+
+  @override
+  State<AssignClasses> createState() => _AssignClassesState();
+}
+
+class _AssignClassesState extends State<AssignClasses> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final TextEditingController _classNameController = TextEditingController();
+  final TextEditingController _sectionController = TextEditingController();
+
+  Future<void> _addClass() async {
+    if (_classNameController.text.isNotEmpty && _sectionController.text.isNotEmpty) {
+      try {
+        await _firestore.collection('classes').add({
+          'className': _classNameController.text,
+          'section': _sectionController.text,
+        });
+        _classNameController.clear();
+        _sectionController.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Class added successfully')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error adding class: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteClass(String docId) async {
+    try {
+      await _firestore.collection('classes').doc(docId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Class deleted successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting class: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Assign classes"),
+        title: const Text("Assign Classes"),
       ),
-      body: const Center(
-        child: Text(
-          "classes Assignment Page",
-          style: TextStyle(fontSize: 18),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _classNameController,
+              decoration: const InputDecoration(labelText: 'Class Name'),
+            ),
+            TextField(
+              controller: _sectionController,
+              decoration: const InputDecoration(labelText: 'Section'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _addClass,
+              child: const Text('Add Class'),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _firestore.collection('classes').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text('No classes found'));
+                  }
+                  final classes = snapshot.data!.docs;
+                  return ListView.builder(
+                    itemCount: classes.length,
+                    itemBuilder: (context, index) {
+                      final classData = classes[index].data() as Map<String, dynamic>;
+                      final docId = classes[index].id;
+                      return ListTile(
+                        title: Text('${classData['className']} - ${classData['section']}'),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _deleteClass(docId),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
