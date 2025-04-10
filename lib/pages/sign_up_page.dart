@@ -119,7 +119,6 @@ class _SignUpPageState extends State<SignUpPage> {
                 },
               ),
               const SizedBox(height: 16),
-
               if (_selectedRole == 'Student') ...[
                 // Class Field
                 TextFormField(

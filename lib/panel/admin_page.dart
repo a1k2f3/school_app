@@ -32,12 +32,24 @@ class AdminPanelPage extends StatelessWidget {
               child: const Text("Manage Courses (CRUD)"),
             ),
             const SizedBox(height: 10),
+             ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ManageCoursesPage(),
+                  ),
+                );
+              },
+              child: const Text("Manege Classes (CRUD)"),
+            ),
+            const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AssignCoursesPage(),
+                    builder: (context) => const AssignClasses(),
                   ),
                 );
               },
@@ -92,6 +104,24 @@ class AssignCoursesPage extends StatelessWidget {
       body: const Center(
         child: Text(
           "Assign Courses to Classes and Teachers",
+          style: TextStyle(fontSize: 18),
+        ),
+      ),
+    );
+  }
+}
+class AssignClasses extends StatelessWidget {
+  const AssignClasses({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Assign classes"),
+      ),
+      body: const Center(
+        child: Text(
+          "classes Assignment Page",
           style: TextStyle(fontSize: 18),
         ),
       ),
