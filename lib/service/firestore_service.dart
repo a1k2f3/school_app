@@ -34,7 +34,7 @@ class FirestoreService {
   }
 Future<void> createclasses(Map<String, dynamic> productData) async {
     try {
-      await _firestore.collection('products').add(productData);
+      await _firestore.collection('classes').add(productData);
     } catch (e) {
       throw Exception('Error creating product: $e');
     }
@@ -42,7 +42,7 @@ Future<void> createclasses(Map<String, dynamic> productData) async {
 
   Future<List<Map<String, dynamic>>> readclasses() async {
     try {
-      QuerySnapshot snapshot = await _firestore.collection('products').get();
+      QuerySnapshot snapshot = await _firestore.collection('classes').get();
       return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
     } catch (e) {
       throw Exception('Error reading products: $e');
@@ -51,7 +51,7 @@ Future<void> createclasses(Map<String, dynamic> productData) async {
 
   Future<void> updateclasses(String docId, Map<String, dynamic> updatedData) async {
     try {
-      await _firestore.collection('products').doc(docId).update(updatedData);
+      await _firestore.collection('classes').doc(docId).update(updatedData);
     } catch (e) {
       throw Exception('Error updating product: $e');
     }
@@ -59,7 +59,7 @@ Future<void> createclasses(Map<String, dynamic> productData) async {
 
   Future<void> deleteclasses(String docId) async {
     try {
-      await _firestore.collection('products').doc(docId).delete();
+      await _firestore.collection('classes').doc(docId).delete();
     } catch (e) {
       throw Exception('Error deleting product: $e');
     }
