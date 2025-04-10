@@ -33,16 +33,16 @@ class AdminPanelPage extends StatelessWidget {
               child: const Text("Manage Courses (CRUD)"),
             ),
             const SizedBox(height: 10),
-             ElevatedButton(
+            ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ManageCoursesPage(),
+                    builder: (context) => const AssignCoursesPage(),
                   ),
                 );
               },
-              child: const Text("Manege Classes (CRUD)"),
+              child: const Text("Assign Courses to Classes"),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
@@ -95,7 +95,6 @@ class ManageCoursesPage extends StatelessWidget {
 }
 class AssignCoursesPage extends StatelessWidget {
   const AssignCoursesPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

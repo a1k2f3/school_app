@@ -64,36 +64,33 @@ Future<void> createclasses(Map<String, dynamic> productData) async {
       throw Exception('Error deleting product: $e');
     }
   }
-  // Future<void> createOrder(Map<String, dynamic> orderData) async {
-  //   try {
-  //     await _firestore.collection('orders').add(orderData);
-  //   } catch (e) {
-  //     throw Exception('Error creating order: $e');
-  //   }
-  // }
-  // Future<List<Map<String, dynamic>>> readOrders() async {
-  //   try {
-  //     QuerySnapshot snapshot = await _firestore.collection('orders').get();
-  //     return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-  //   } catch (e) {
-  //     throw Exception('Error reading orders: $e');
-  //   }
-  // }
-
-  // Future<void> updateOrder(String docId, Map<String, dynamic> updatedData) async {
-  //   try {
-  //     await _firestore.collection('orders').doc(docId).update(updatedData);
-  //   } catch (e) {
-  //     throw Exception('Error updating order: $e');
-  //   }
-  // }
-
-  // Future<void> deleteOrder(String docId) async {
-  //   try {
-  //     await _firestore.collection('orders').doc(docId).delete();
-  //   } catch (e) {
-  //     throw Exception('Error deleting order: $e');
-  //   }
-  // }
-
+  Future<void> createCourse(Map<String, dynamic> assignmentData) async {
+    try {
+      await _firestore.collection('assignments').add(assignmentData);
+    } catch (e) {
+      throw Exception('Error creating assignment: $e');
+    }
+  }
+  Future<List<Map<String, dynamic>>> readCourse() async {
+    try {
+      QuerySnapshot snapshot = await _firestore.collection('assignments').get();
+      return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    } catch (e) {
+      throw Exception('Error reading assignments: $e');
+    }
+  }
+  Future<void> updateCourse(String docId, Map<String, dynamic> updatedData) async {
+    try {
+      await _firestore.collection('assignments').doc(docId).update(updatedData);
+    } catch (e) {
+      throw Exception('Error updating assignment: $e');
+    }
+  }
+  Future<void> deleteCourse(String docId) async {
+    try {
+      await _firestore.collection('assignments').doc(docId).delete();
+    } catch (e) {
+      throw Exception('Error deleting assignment: $e');
+    }
+  }
 }
