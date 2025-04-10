@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:school_app/login_page.dart';
-
+import 'package:school_app/service/firestore_service.dart';
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
-
   @override
   State<SignUpPage> createState() => _SignUpPageState();
 }
-
 class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
@@ -21,7 +19,36 @@ class _SignUpPageState extends State<SignUpPage> {
   String? _selectedRole;
   String? _selectedGender;
   String? _selectedBloodGroup;
-
+  final FirestoreService _firestoreService = FirestoreService();
+  Future<void> _createUser() async {
+    try {
+      await _firestoreService.createUser({
+        'email': _emailController.text,
+        'password': _passwordController.text,
+        'role': _selectedRole,
+        'class': _selectedRole == 'Student' ? _classController.text : null,
+        'firstName': _firstNameController.text,
+        'middleName': _middleNameController.text,
+        'lastName': _lastNameController.text,
+        'gender': _selectedGender,
+        'dob': _dobController.text,
+        'nationality': _nationalityController.text,
+        'bloodGroup': _selectedBloodGroup,
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User created successfully!')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+      print('Error creating user: $e');
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,8 +78,6 @@ class _SignUpPageState extends State<SignUpPage> {
                 },
               ),
               const SizedBox(height: 16),
-
-              // Password Field
               TextFormField(
                 controller: _passwordController,
                 decoration: const InputDecoration(
@@ -71,8 +96,6 @@ class _SignUpPageState extends State<SignUpPage> {
                 },
               ),
               const SizedBox(height: 16),
-
-              // Role Selection Dropdown
               DropdownButtonFormField<String>(
                 value: _selectedRole,
                 decoration: const InputDecoration(
@@ -97,7 +120,6 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 16),
 
-              // Additional Fields for Students
               if (_selectedRole == 'Student') ...[
                 // Class Field
                 TextFormField(
@@ -223,10 +245,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     border: OutlineInputBorder(),
                   ),
                   items: const [
-                    DropdownMenuItem(value: 'A+', child: Text('A+')),
-                    DropdownMenuItem(value: 'A-', child: Text('A-')),
-                    DropdownMenuItem(value: 'B+', child: Text('B+')),
-                    DropdownMenuItem(value: 'B-', child: Text('B-')),
+                                        DropdownMenuItem(value: 'B-', child: Text('B-')),
                     DropdownMenuItem(value: 'O+', child: Text('O+')),
                     DropdownMenuItem(value: 'O-', child: Text('O-')),
                     DropdownMenuItem(value: 'AB+', child: Text('AB+')),
@@ -238,23 +257,27 @@ class _SignUpPageState extends State<SignUpPage> {
                     });
                   },
                 ),
-                const SizedBox(height: 16),
               ],
 
               // Submit Button
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Signing up...')),
-                    );
+                    _createUser();
                   }
-                   Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
                 },
-                child: const Text('Next'),
+                child: const Text('Sign Up'),
+              ),
+
+              // Login Redirect
+              TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                  );
+                },
+                child: const Text('Already have an account? Log in'),
               ),
             ],
           ),

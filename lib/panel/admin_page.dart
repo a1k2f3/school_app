@@ -80,7 +80,6 @@ class ManageCoursesPage extends StatelessWidget {
     );
   }
 }
-
 class AssignCoursesPage extends StatelessWidget {
   const AssignCoursesPage({super.key});
 
@@ -99,10 +98,8 @@ class AssignCoursesPage extends StatelessWidget {
     );
   }
 }
-
 class CreateTimetablePage extends StatelessWidget {
   const CreateTimetablePage({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
