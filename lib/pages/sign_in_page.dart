@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_app/pages/mainhomepage.dart';
+import 'package:school_app/panel/admin_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,6 +13,7 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  String? _selectedRole;
   bool _obscurePassword = true;
   bool _isLoading = false;
 
@@ -30,6 +32,15 @@ class _LoginPageState extends State<LoginPage> {
 
   void _login() {
     if (_formKey.currentState!.validate()) {
+      // Check if the role is Admin and set predefined credentials
+      if (_selectedRole == "Admin") {
+        _emailController.text = "akifbutt935@gmail.com";
+        _passwordController.text = "123456";
+     Navigator.push(
+            context, MaterialPageRoute(builder: (context) =>AdminPanelPage()));
+    
+      }
+
       setState(() {
         _isLoading = true;
       });
@@ -42,7 +53,8 @@ class _LoginPageState extends State<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Login Successful")),
         );
-       Navigator.push(context,MaterialPageRoute(builder:(context)=> Mainhomepage() ));
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => Mainhomepage()));
       });
     }
   }
@@ -112,6 +124,39 @@ class _LoginPageState extends State<LoginPage> {
                         return "Please enter your password";
                       } else if (value.length < 6) {
                         return "Password must be at least 6 characters";
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  DropdownButtonFormField<String>(
+                    value: _selectedRole,
+                    decoration: const InputDecoration(
+                      labelText: "Role",
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: "Admin",
+                        child: Text("Admin"),
+                      ),
+                      DropdownMenuItem(
+                        value: "Teacher",
+                        child: Text("Teacher"),
+                      ),
+                      DropdownMenuItem(
+                        value: "Student",
+                        child: Text("Student"),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedRole = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please select a role";
                       }
                       return null;
                     },

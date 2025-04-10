@@ -36,7 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   percent_indicator: ^4.2.4
   youtube_player_flutter: ^9.1.1
-  # flutter_pie_chart: ^0.0.1
+  firebase_core: ^3.13.0
+  cloud_firestore: ^5.6.6
 
 dev_dependencies:
   flutter_test:

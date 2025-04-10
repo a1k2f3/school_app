@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1080067213916",
+    "project_id": "sufaschool",
+    "storage_bucket": "sufaschool.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1080067213916:android:98e4f3c5f889575a51b499",
+        "android_client_info": {
+          "package_name": "com.example.school_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0dC01yEoYoTiLVcwYBZmOu3f84cFDVr0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
