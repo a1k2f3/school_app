@@ -66,14 +66,14 @@ Future<void> createclasses(Map<String, dynamic> productData) async {
   }
   Future<void> createCourse(Map<String, dynamic> assignmentData) async {
     try {
-      await _firestore.collection('course').add(assignmentData);
+      await _firestore.collection('courses').add(assignmentData);
     } catch (e) {
       throw Exception('Error creating assignment: $e');
     }
   }
   Future<List<Map<String, dynamic>>> readCourse() async {
     try {
-      QuerySnapshot snapshot = await _firestore.collection('course').get();
+      QuerySnapshot snapshot = await _firestore.collection('courses').get();
       return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
     } catch (e) {
       throw Exception('Error reading assignments: $e');
@@ -81,16 +81,46 @@ Future<void> createclasses(Map<String, dynamic> productData) async {
   }
   Future<void> updateCourse(String docId, Map<String, dynamic> updatedData) async {
     try {
-      await _firestore.collection('course').doc(docId).update(updatedData);
+      await _firestore.collection('courses').doc(docId).update(updatedData);
     } catch (e) {
       throw Exception('Error updating assignment: $e');
     }
   }
   Future<void> deleteCourse(String docId) async {
     try {
-      await _firestore.collection('course').doc(docId).delete();
+      await _firestore.collection('courses').doc(docId).delete();
     } catch (e) {
       throw Exception('Error deleting assignment: $e');
     }
   }
+  Future<void> createAssignment(Map<String, dynamic> assignmentData) async {
+    try {
+      await _firestore.collection('assignments').add(assignmentData);
+    } catch (e) {
+      throw Exception('Error creating assignment: $e');
+    }
+  }
+  Future<List<Map<String, dynamic>>> readAssignment() async {
+    try {
+      QuerySnapshot snapshot = await _firestore.collection('assignments').get();
+      return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    } catch (e) {
+      throw Exception('Error reading assignments: $e');
+    }
+  }
+  Future<void> updateAssignment(String docId, Map<String, dynamic> updatedData) async {
+    try {
+      await _firestore.collection('assignments').doc(docId).update(updatedData);
+    } catch (e) {
+      throw Exception('Error updating assignment: $e');
+    }
+  }
+  Future<void> deleteAssignment(String docId) async {
+    try {
+      await _firestore.collection('assignments').doc(docId).delete();
+    } catch (e) {
+      throw Exception('Error deleting assignment: $e');
+    }
+  }
+   
 }

@@ -26,7 +26,7 @@ class AdminPanelPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ManageCoursesPage(),
+                    builder: (context) => const ManageCourses(),
                   ),
                 );
               },
@@ -75,8 +75,59 @@ class AdminPanelPage extends StatelessWidget {
   }
 }
 
-class ManageCoursesPage extends StatelessWidget {
-  const ManageCoursesPage({super.key});
+class ManageCourses extends StatefulWidget {
+  const ManageCourses({super.key});
+
+  @override
+  State<ManageCourses> createState() => _ManageCoursesState();
+}
+
+class _ManageCoursesState extends State<ManageCourses> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final TextEditingController _courseNameController = TextEditingController();
+  final TextEditingController _courseCodeController = TextEditingController();
+  final TextEditingController _classAssignedController = TextEditingController();
+  final TextEditingController _teacherAssignedController = TextEditingController();
+
+  Future<void> _addCourse() async {
+    if (_courseNameController.text.isNotEmpty &&
+        _courseCodeController.text.isNotEmpty &&
+        _classAssignedController.text.isNotEmpty &&
+        _teacherAssignedController.text.isNotEmpty) {
+      try {
+        await _firestore.collection('courses').add({
+          'courseName': _courseNameController.text,
+          'courseCode': _courseCodeController.text,
+          'classAssigned': _classAssignedController.text,
+          'teacherAssigned': _teacherAssignedController.text,
+        });
+        _courseNameController.clear();
+        _courseCodeController.clear();
+        _classAssignedController.clear();
+        _teacherAssignedController.clear();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Course added successfully')),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error adding course: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _deleteCourse(String docId) async {
+    try {
+      await _firestore.collection('courses').doc(docId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Course deleted successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting course: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,10 +135,64 @@ class ManageCoursesPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text("Manage Courses"),
       ),
-      body: const Center(
-        child: Text(
-          "CRUD Operations for Courses",
-          style: TextStyle(fontSize: 18),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _courseNameController,
+              decoration: const InputDecoration(labelText: 'Course Name'),
+            ),
+            TextField(
+              controller: _courseCodeController,
+              decoration: const InputDecoration(labelText: 'Course Code'),
+            ),
+            TextField(
+              controller: _classAssignedController,
+              decoration: const InputDecoration(labelText: 'Class Assigned'),
+            ),
+            TextField(
+              controller: _teacherAssignedController,
+              decoration: const InputDecoration(labelText: 'Teacher Assigned'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _addCourse,
+              child: const Text('Add Course'),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _firestore.collection('courses').snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(child: Text('No courses found'));
+                  }
+                  final courses = snapshot.data!.docs;
+                  return ListView.builder(
+                    itemCount: courses.length,
+                    itemBuilder: (context, index) {
+                      final courseData = courses[index].data() as Map<String, dynamic>;
+                      final docId = courses[index].id;
+                      return ListTile(
+                        title: Text('${courseData['courseName']} (${courseData['courseCode']})'),
+                        subtitle: Text(
+                          'Class: ${courseData['classAssigned']}\nTeacher: ${courseData['teacherAssigned']}',
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _deleteCourse(docId),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
