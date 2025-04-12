@@ -4,7 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart'; // For kIsWeb
+import 'package:flutter/foundation.dart';
+import 'package:school_app/service/firestore_service.dart'; // For kIsWeb
 // import 'package:file_picker/file_picker.dart';
 class AdminPanelPage extends StatelessWidget {
   const AdminPanelPage({super.key});
@@ -71,9 +72,20 @@ class AdminPanelPage extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text("Create timetablepage"),
+              child: const Text("manege Timetable"),
+            ),ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>  CreateStudentPage(),
+                  ),
+                );
+              },
+              child: const Text("Manege Student"),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 10),        
+             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -91,7 +103,6 @@ class AdminPanelPage extends StatelessWidget {
     );
   }
 }
-
 class ManageCourses extends StatefulWidget {
   const ManageCourses({super.key});
 
@@ -553,7 +564,8 @@ class _AssignmentState extends State<Assignment> {
       ),
     );
   }
-}class CreateTimetablePage extends StatelessWidget {
+}
+class CreateTimetablePage extends StatelessWidget {
   const CreateTimetablePage({super.key});
   @override
   Widget build(BuildContext context) {
@@ -568,5 +580,122 @@ class _AssignmentState extends State<Assignment> {
         ),
       ),
     );
+  }
+}
+
+class CreateStudentPage extends StatelessWidget {
+  final FirestoreService _firestoreService = FirestoreService();
+
+  CreateStudentPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Student Management"),
+      ),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _firestoreService.readUsers(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No student records found.'));
+          }
+
+          final students = snapshot.data!;
+
+          return ListView.builder(
+            itemCount: students.length,
+            itemBuilder: (context, index) {
+              final student = students[index];
+              final docId = student['id']; // Ensure 'id' is part of the data
+
+              return ListTile(
+                title: Text(student['firstName'] ?? 'No Name'),
+                subtitle: Text('Email: ${student['email'] ?? 'No Email'}\nSex: ${student['gender'] ?? 'Unknown'}'),
+                // dense:Text('Sex:${ student['gender']}??'),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      onPressed: () => _showEditDialog(context, docId, student),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _deleteStudent(context, docId),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  void _showEditDialog(
+    BuildContext context, String docId, Map<String, dynamic> student) {
+  final TextEditingController nameController =
+      TextEditingController(text: student['firstName'] ?? '');
+  final TextEditingController emailController =
+      TextEditingController(text: student['email'] ?? '');
+
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Edit Student'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Name'),
+            ),
+            TextField(
+              controller: emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final updatedData = {
+                'firstName': nameController.text,
+                'email': emailController.text,
+              };
+              // Call your Firestore update method here
+              Navigator.pop(context);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      );
+    },
+  );
+}
+  void _deleteStudent(BuildContext context, String docId) async {
+    try {
+      await _firestoreService.deleteUser(docId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Student deleted successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting student: $e')),
+      );
+    }
   }
 }

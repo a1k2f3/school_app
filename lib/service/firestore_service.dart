@@ -9,6 +9,28 @@ class FirestoreService {
       throw Exception('Error creating user: $e');
     }
   }
+  Future<void> Userlogin(String email, String password, String role) async {
+  try {
+    // Query the Firestore collection for a user with the given email, password, and role
+    final querySnapshot = await _firestore
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .where('password', isEqualTo: password)
+        .where('role', isEqualTo: role)
+        .get();
+
+    // Check if a user was found
+    if (querySnapshot.docs.isEmpty) {
+      throw Exception('No user found with the provided email, password, and role.');
+    }
+
+    // Retrieve the user data
+    final userData = querySnapshot.docs.first.data();
+    print('User logged in successfully: $userData');
+  } catch (e) {
+    throw Exception('Error logging in user: $e');
+  }
+}
   Future<List<Map<String, dynamic>>> readUsers() async {
     try {
       QuerySnapshot snapshot = await _firestore.collection('users').get();

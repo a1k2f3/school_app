@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -6,10 +7,12 @@ class LoginPage extends StatefulWidget {
   // ignore: library_private_types_in_public_api
   _LoginPageState createState() => _LoginPageState();
 }
+
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _roleController = TextEditingController();
   bool _obscurePassword = true;
 
   void _togglePasswordVisibility() {
@@ -18,11 +21,42 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void _login() {
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      // Handle login logic
-      print("Email: ${_emailController.text}");
-      print("Password: ${_passwordController.text}");
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+      final role = _roleController.text.trim();
+
+      try {
+        // Query Firestore for a user with the given email, password, and role
+        final querySnapshot = await FirebaseFirestore.instance
+            .collection('users')
+            .where('email', isEqualTo: email)
+            .where('password', isEqualTo: password)
+            .where('role', isEqualTo: role)
+            .get();
+
+        if (querySnapshot.docs.isEmpty) {
+          // No user found
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Invalid email, password, or role')),
+          );
+        } else {
+          // User found
+          final userData = querySnapshot.docs.first.data();
+          print('Login successful: $userData');
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login successful')),
+          );
+          print(userData);
+
+          // Navigate to the next page or perform other actions
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
     }
   }
 
@@ -78,6 +112,20 @@ class _LoginPageState extends State<LoginPage> {
                         return "Please enter your password";
                       } else if (value.length < 6) {
                         return "Password must be at least 6 characters";
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _roleController,
+                    decoration: const InputDecoration(
+                      labelText: "Role",
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return "Please enter your role";
                       }
                       return null;
                     },
