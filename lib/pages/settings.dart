@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:school_app/pages/Security.dart';
 import 'package:school_app/pages/cusomize.dart';
-import 'package:school_app/pages/help_support.dart';
 import 'package:school_app/pages/notification.dart';
 import 'package:school_app/pages/profile.dart';
 import 'package:school_app/pages/mainhomepage.dart';

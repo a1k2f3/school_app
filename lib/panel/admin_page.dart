@@ -1,6 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'; // For kIsWeb
+// import 'package:file_picker/file_picker.dart';
 class AdminPanelPage extends StatelessWidget {
   const AdminPanelPage({super.key});
 
@@ -42,7 +47,7 @@ class AdminPanelPage extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text("Assign Courses to Classes"),
+              child: const Text("Assgin Classes (CRUD)"),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
@@ -54,7 +59,7 @@ class AdminPanelPage extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text("Assign Courses to Class and Teacher"),
+              child: const Text("Assign classes"),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
@@ -66,7 +71,19 @@ class AdminPanelPage extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text("Create Timetable"),
+              child: const Text("Create timetablepage"),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const Assignment(),
+                  ),
+                );
+              },
+              child: const Text("Asginment Management"),
             ),
           ],
         ),
@@ -88,7 +105,6 @@ class _ManageCoursesState extends State<ManageCourses> {
   final TextEditingController _courseCodeController = TextEditingController();
   final TextEditingController _classAssignedController = TextEditingController();
   final TextEditingController _teacherAssignedController = TextEditingController();
-
   Future<void> _addCourse() async {
     if (_courseNameController.text.isNotEmpty &&
         _courseCodeController.text.isNotEmpty &&
@@ -217,7 +233,6 @@ class AssignCoursesPage extends StatelessWidget {
 }
 class AssignClasses extends StatefulWidget {
   const AssignClasses({super.key});
-
   @override
   State<AssignClasses> createState() => _AssignClassesState();
 }
@@ -318,7 +333,227 @@ class _AssignClassesState extends State<AssignClasses> {
     );
   }
 }
-class CreateTimetablePage extends StatelessWidget {
+class Assignment extends StatefulWidget {
+  const Assignment({super.key});
+
+  @override
+  State<Assignment> createState() => _AssignmentState();
+}
+
+class _AssignmentState extends State<Assignment> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _deadlineController = TextEditingController();
+  final TextEditingController _classNameController = TextEditingController();
+
+  Future<void> _addAssignment() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        // Pick admin file
+        FilePickerResult? result = await FilePicker.platform.pickFiles();
+        if (result != null) {
+          final file = result.files.single;
+          final filePath = file.path!;
+          final fileName = file.name;
+
+          // Upload file to Firebase Storage
+          final ref = _storage.ref().child('assignments/$fileName');
+          await ref.putFile(File(filePath));
+          final fileUrl = await ref.getDownloadURL();
+
+          // Add assignment to Firestore
+          await _firestore.collection('assignments').add({
+            'title': _titleController.text,
+            'description': _descriptionController.text,
+            'deadline': _deadlineController.text,
+            'className': _classNameController.text,
+            'adminFileUrl': fileUrl,
+            'userFileUrl': null,
+          });
+
+          _clearForm();
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Assignment added successfully')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No file selected')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error adding assignment: $e')),
+        );
+        print(e)  ;
+      }
+    }
+  }
+
+  Future<void> _uploadUserFile(String docId) async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      if (result != null) {
+        final file = result.files.single;
+        final filePath = file.path!;
+        final fileName = file.name;
+
+        // Upload file to Firebase Storage
+        final ref = _storage.ref().child('user_tasks/$fileName');
+        await ref.putFile(File(filePath));
+        final fileUrl = await ref.getDownloadURL();
+
+        // Update Firestore with user file URL
+        await _firestore.collection('assignments').doc(docId).update({
+          'userFileUrl': fileUrl,
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('File uploaded successfully')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No file selected')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error uploading file: $e')),
+      );
+    }
+  }
+
+  Future<void> _deleteAssignment(String docId) async {
+    try {
+      await _firestore.collection('assignments').doc(docId).delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Assignment deleted successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting assignment: $e')),
+      );
+    }
+  }
+  void _clearForm() {
+    _titleController.clear();
+    _descriptionController.clear();
+    _deadlineController.clear();
+    _classNameController.clear();
+  }
+
+  Future<void> _pickDeadline() async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2100),
+    );
+    if (pickedDate != null) {
+      _deadlineController.text = pickedDate.toIso8601String().split('T').first;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Assignments"),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _titleController,
+                    decoration: const InputDecoration(labelText: 'Title'),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Title is required' : null,
+                  ),
+                  TextFormField(
+                    controller: _descriptionController,
+                    decoration: const InputDecoration(labelText: 'Description'),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Description is required' : null,
+                  ),
+                  TextFormField(
+                    controller: _deadlineController,
+                    readOnly: true,
+                    decoration: const InputDecoration(labelText: 'Deadline'),
+                    onTap: _pickDeadline,
+                    validator: (value) =>
+                        value!.isEmpty ? 'Deadline is required' : null,
+                  ),
+                  TextFormField(
+                    controller: _classNameController,
+                    decoration: const InputDecoration(labelText: 'Class Name'),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Class Name is required' : null,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _addAssignment,
+                    child: const Text('Add Assignment'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            StreamBuilder<QuerySnapshot>(
+              stream: _firestore.collection('assignments').snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(child: Text('No assignments found'));
+                }
+                final assignments = snapshot.data!.docs;
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: assignments.length,
+                  itemBuilder: (context, index) {
+                    final assignmentData =
+                        assignments[index].data() as Map<String, dynamic>;
+                    final docId = assignments[index].id;
+                    return ListTile(
+                      title: Text(assignmentData['title']),
+                      subtitle: Text(
+                          'Class: ${assignmentData['className']}\nDeadline: ${assignmentData['deadline']}\nDescription: ${assignmentData['description']}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.upload_file,
+                                color: Colors.blue),
+                            onPressed: () => _uploadUserFile(docId),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _deleteAssignment(docId),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}class CreateTimetablePage extends StatelessWidget {
   const CreateTimetablePage({super.key});
   @override
   Widget build(BuildContext context) {

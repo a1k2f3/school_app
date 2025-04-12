@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:school_app/pages/course.dart';
 import 'package:school_app/pages/help_support.dart';
