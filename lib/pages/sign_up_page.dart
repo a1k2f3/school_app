@@ -16,6 +16,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _nationalityController = TextEditingController();
   final TextEditingController _classController = TextEditingController();
+  final TextEditingController _qualification = TextEditingController();
   String? _selectedRole;
   String? _selectedGender;
   String? _selectedBloodGroup;
@@ -26,7 +27,7 @@ class _SignUpPageState extends State<SignUpPage> {
         'email': _emailController.text,
         'password': _passwordController.text,
         'role': _selectedRole,
-        'class': _selectedRole == 'Student' ? _classController.text : null,
+        'class':  _classController.text ,
         'firstName': _firstNameController.text,
         'middleName': _middleNameController.text,
         'lastName': _lastNameController.text,
@@ -34,6 +35,7 @@ class _SignUpPageState extends State<SignUpPage> {
         'dob': _dobController.text,
         'nationality': _nationalityController.text,
         'bloodGroup': _selectedBloodGroup,
+        'qualifiction': _qualification.text,
       });
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('User created successfully!')),
@@ -105,6 +107,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 items: const [
                   DropdownMenuItem(value: 'Teacher', child: Text('Teacher')),
                   DropdownMenuItem(value: 'Student', child: Text('Student')),
+                  DropdownMenuItem(value: 'Admin', child: Text('Admin')),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -256,7 +259,305 @@ class _SignUpPageState extends State<SignUpPage> {
                     });
                   },
                 ),
+                
               ],
+
+              // Submit Button
+              
+if (_selectedRole == 'Teacher') ...[
+                // Class Field
+                TextFormField(
+                  controller: _classController,
+                  decoration: const InputDecoration(
+                    labelText: 'Class',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your class';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Full Name Fields
+                TextFormField(
+                  controller: _firstNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'First Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your first name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _middleNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Middle Name (Optional)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _lastNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Last Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your last name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Gender Dropdown
+                DropdownButtonFormField<String>(
+                  value: _selectedGender,
+                  decoration: const InputDecoration(
+                    labelText: 'Gender',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'Male', child: Text('Male')),
+                    DropdownMenuItem(value: 'Female', child: Text('Female')),
+                    DropdownMenuItem(value: 'Other', child: Text('Other')),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedGender = value;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select your gender';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Date of Birth Field
+                TextFormField(
+                  controller: _dobController,
+                  decoration: const InputDecoration(
+                    labelText: 'Date of Birth (DD/MM/YYYY)',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.datetime,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your date of birth';
+                    }
+                    if (!RegExp(r'^\d{2}/\d{2}/\d{4}$').hasMatch(value)) {
+                      return 'Please enter a valid date in DD/MM/YYYY format';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Nationality Field
+                TextFormField(
+                  controller: _nationalityController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nationality/Citizenship',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your nationality';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Blood Group Dropdown (Optional)
+                DropdownButtonFormField<String>(
+                  value: _selectedBloodGroup,
+                  decoration: const InputDecoration(
+                    labelText: 'Blood Group (Optional)',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                                        DropdownMenuItem(value: 'B-', child: Text('B-')),
+                    DropdownMenuItem(value: 'O+', child: Text('O+')),
+                    DropdownMenuItem(value: 'O-', child: Text('O-')),
+                    DropdownMenuItem(value: 'AB+', child: Text('AB+')),
+                    DropdownMenuItem(value: 'AB-', child: Text('AB-')),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedBloodGroup = value;
+                    });
+                  },
+                ),
+                TextFormField(
+                  controller: _qualification,
+                  decoration: const InputDecoration(
+                    labelText: 'Qualification',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your Qualification';
+                    }
+                    return null;
+                  },
+                ),
+                
+              ],
+               if (_selectedRole == 'Admin') ...[
+                // Class Field
+                
+                const SizedBox(height: 16),
+
+                // Full Name Fields
+                TextFormField(
+                  controller: _firstNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'First Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your first name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _middleNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Middle Name (Optional)',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _lastNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Last Name',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your last name';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Gender Dropdown
+                DropdownButtonFormField<String>(
+                  value: _selectedGender,
+                  decoration: const InputDecoration(
+                    labelText: 'Gender',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'Male', child: Text('Male')),
+                    DropdownMenuItem(value: 'Female', child: Text('Female')),
+                    DropdownMenuItem(value: 'Other', child: Text('Other')),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedGender = value;
+                    });
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please select your gender';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Date of Birth Field
+                TextFormField(
+                  controller: _dobController,
+                  decoration: const InputDecoration(
+                    labelText: 'Date of Birth (DD/MM/YYYY)',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.datetime,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your date of birth';
+                    }
+                    if (!RegExp(r'^\d{2}/\d{2}/\d{4}$').hasMatch(value)) {
+                      return 'Please enter a valid date in DD/MM/YYYY format';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Nationality Field
+                TextFormField(
+                  controller: _nationalityController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nationality/Citizenship',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your nationality';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+
+                // Blood Group Dropdown (Optional)
+                DropdownButtonFormField<String>(
+                  value: _selectedBloodGroup,
+                  decoration: const InputDecoration(
+                    labelText: 'Blood Group (Optional)',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                                        DropdownMenuItem(value: 'B-', child: Text('B-')),
+                    DropdownMenuItem(value: 'O+', child: Text('O+')),
+                    DropdownMenuItem(value: 'O-', child: Text('O-')),
+                    DropdownMenuItem(value: 'AB+', child: Text('AB+')),
+                    DropdownMenuItem(value: 'AB-', child: Text('AB-')),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedBloodGroup = value;
+                    });
+                  },
+                ),
+                TextFormField(
+                  controller: _qualification,
+                  decoration: const InputDecoration(
+                    labelText: 'Qualification',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your Qualification';
+                    }
+                    return null;
+                  },
+                ),
+                
+              ],
+
+    
 
               // Submit Button
               ElevatedButton(
@@ -267,7 +568,6 @@ class _SignUpPageState extends State<SignUpPage> {
                 },
                 child: const Text('Sign Up'),
               ),
-
               // Login Redirect
               TextButton(
                 onPressed: () {

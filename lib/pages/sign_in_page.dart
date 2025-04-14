@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:school_app/pages/mainhomepage.dart';
 import 'package:school_app/panel/admin_page.dart';
@@ -13,6 +14,8 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _roleController = TextEditingController();
+  
   String? _selectedRole;
   bool _obscurePassword = true;
   bool _isLoading = false;
@@ -30,34 +33,87 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void _login() {
-    if (_formKey.currentState!.validate()) {
-      // Check if the role is Admin and set predefined credentials
-      if (_selectedRole == "Admin") {
-        _emailController.text = "akifbutt935@gmail.com";
-        _passwordController.text = "123456";
-     Navigator.push(
-            context, MaterialPageRoute(builder: (context) =>AdminPanelPage()));
+  // void _login() {
+  //   if (_formKey.currentState!.validate()) {
+  //     // Check if the role is Admin and set predefined credentials
+  //     if (_selectedRole == "Admin") {
+  //       _emailController.text = "akifbutt935@gmail.com";
+  //       _passwordController.text = "123456";
+  //    Navigator.push(
+  //           context, MaterialPageRoute(builder: (context) =>AdminPanelPage()));
     
-      }
+  //     }
 
-      setState(() {
-        _isLoading = true;
-      });
+  //     setState(() {
+  //       _isLoading = true;
+  //     });
 
-      Future.delayed(const Duration(seconds: 2), () {
-        setState(() {
-          _isLoading = false;
-        });
+  //     Future.delayed(const Duration(seconds: 2), () {
+  //       setState(() {
+  //         _isLoading = false;
+  //       });
 
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text("Login Successful")),
+  //       );
+  //       Navigator.push(
+  //           context, MaterialPageRoute(builder: (context) => Mainhomepage()));
+  //     });
+  //   }
+  // }
+ Future<void> _login2() async {
+  if (_formKey.currentState!.validate()) {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final role = _selectedRole;
+
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .where('password', isEqualTo: password)
+          .where('role', isEqualTo: role)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Login Successful")),
+          const SnackBar(content: Text('Invalid email, password, or role')),
         );
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Mainhomepage()));
-      });
+      } else {
+        final userData = querySnapshot.docs.first.data();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login successful')),
+        );
+
+        if (userData['role'] == 'Admin') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AdminPanelPage()),
+          );
+        } else if(userData['role'] == 'Student') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Mainhomepage()),
+          );
+        } else if (userData['role'] == 'Teacher') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>Mainhomepage()),
+          );
+        }
+         else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Role not recognized')),
+          );
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +221,7 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _login,
+                      onPressed: _isLoading ? null : _login2,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         textStyle: const TextStyle(fontSize: 18),

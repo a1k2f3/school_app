@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:school_app/pages/mainhomepage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -50,7 +51,23 @@ class _LoginPageState extends State<LoginPage> {
           );
           print(userData);
 
-          // Navigate to the next page or perform other actions
+          // Navigate to the next screen based on the role
+          if (userData['role'] == 'admin') {
+            // Navigate to admin screen
+            Navigator.pushNamed(context, '/admin');
+          } else if (userData['role'] == 'teacher') {
+            // Navigate to teacher screen
+            Navigator.pushNamed(context, '/teacher');
+          } else if (userData['role'] == 'student') {
+            // Navigate to student screen
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) => const Mainhomepage(),
+            ));
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Role not recognized')),
+            );
+          }
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
