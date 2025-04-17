@@ -5,7 +5,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:school_app/service/firestore_service.dart'; // For kIsWeb
+import 'package:school_app/service/firestore_service.dart';
+import 'package:school_app/teacher/pane.dart'; // For kIsWeb
 // import 'package:file_picker/file_picker.dart';
 class AdminPanelPage extends StatelessWidget {
   const AdminPanelPage({super.key});
@@ -36,19 +37,19 @@ class AdminPanelPage extends StatelessWidget {
                   ),
                 );
               },
-              child: const Text("Manage Courses (CRUD)"),
+              child: const Text("Course manegment"),
             ),
-            const SizedBox(height: 10),
+              const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const AssignCoursesPage(),
+                    builder: (context) =>  CreateTeacherPage(),
                   ),
                 );
               },
-              child: const Text("Assgin Classes (CRUD)"),
+              child: const Text("Teacher Manegment"),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
@@ -64,16 +65,6 @@ class AdminPanelPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CreateTimetablePage(),
-                  ),
-                );
-              },
-              child: const Text("manege Timetable"),
-            ),ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
@@ -547,23 +538,6 @@ class _AssignmentState extends State<Assignment> {
     );
   }
 }
-class CreateTimetablePage extends StatelessWidget {
-  const CreateTimetablePage({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Create Timetable"),
-      ),
-      body: const Center(
-        child: Text(
-          "Timetable Creation Page",
-          style: TextStyle(fontSize: 18),
-        ),
-      ),
-    );
-  }
-}
 
 class CreateStudentPage extends StatelessWidget {
   final FirestoreService _firestoreService = FirestoreService();
@@ -595,12 +569,14 @@ class CreateStudentPage extends StatelessWidget {
             itemCount: students.length,
             itemBuilder: (context, index) {
               final student = students[index];
-              final docId = student['id']; // Ensure 'id' is part of the data
+              final docId = student['id'] ?? ''; // Safeguard against null
 
               return ListTile(
                 title: Text(student['firstName'] ?? 'No Name'),
-                subtitle: Text('Email: ${student['email'] ?? 'No Email'}\nSex: ${student['gender'] ?? 'Unknown'}'),
-                // dense:Text('Sex:${ student['gender']}??'),
+                subtitle: Text(
+                  'Email: ${student['email'] ?? 'No Email'}\n'
+                  'Sex: ${student['gender'] ?? 'Unknown'}',
+                ),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -623,51 +599,60 @@ class CreateStudentPage extends StatelessWidget {
   }
 
   void _showEditDialog(
-    BuildContext context, String docId, Map<String, dynamic> student) {
-  final TextEditingController nameController =
-      TextEditingController(text: student['firstName'] ?? '');
-  final TextEditingController emailController =
-      TextEditingController(text: student['email'] ?? '');
+      BuildContext context, String docId, Map<String, dynamic> users) {
+    final TextEditingController nameController =
+        TextEditingController(text: users['firstName'] ?? '');
+    final TextEditingController emailController =
+        TextEditingController(text: users['email'] ?? '');
 
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Edit Student'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Student'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
             ),
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+            ElevatedButton(
+              onPressed: () async {
+                final updatedData = {
+                  'firstName': nameController.text,
+                  'email': emailController.text,
+                };
+                try {
+                  await _firestoreService.updateUser(docId, updatedData);
+                  Navigator.pop(context);
+                } catch (e) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Update failed: $e')),
+                  );
+                  print(e);
+                }
+              },
+              child: const Text('Save'),
             ),
           ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final updatedData = {
-                'firstName': nameController.text,
-                'email': emailController.text,
-              };
-              // Call your Firestore update method here
-              Navigator.pop(context);
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
+
   void _deleteStudent(BuildContext context, String docId) async {
     try {
       await _firestoreService.deleteUser(docId);
@@ -677,6 +662,140 @@ class CreateStudentPage extends StatelessWidget {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error deleting student: $e')),
+      );
+    }
+  }
+}
+class CreateTeacherPage extends StatelessWidget {
+  final FirestoreService _firestoreService = FirestoreService();
+
+  CreateTeacherPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Teacher Management"),
+      ),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _firestoreService.readAllUsers(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No teacher records found.'));
+          }
+
+          final teachers = snapshot.data!
+              .where((user) => user['role'] == 'Teacher')
+              .toList();
+
+          if (teachers.isEmpty) {
+            return const Center(child: Text('No teacher records found.'));
+          }
+
+          return ListView.builder(
+            itemCount: teachers.length,
+            itemBuilder: (context, index) {
+              final teacher = teachers[index];
+              final docId = teacher['id'] ?? '';
+
+              return ListTile(
+                title: Text(teacher['firstName'] ?? 'No Name'),
+                subtitle: Text(
+                  'Email: ${teacher['email'] ?? 'No Email'}\n'
+                  'Gender: ${teacher['gender'] ?? 'Unknown'}',
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      onPressed: () =>
+                          _showEditDialog(context, docId, teacher),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => _deleteTeacher(context, docId),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  void _showEditDialog(
+      BuildContext context, String docId, Map<String, dynamic> teacher) {
+    final TextEditingController nameController =
+        TextEditingController(text: teacher['firstName'] ?? '');
+    final TextEditingController emailController =
+        TextEditingController(text: teacher['email'] ?? '');
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Edit Teacher'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                controller: emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final updatedData = {
+                  'firstName': nameController.text,
+                  'email': emailController.text,
+                };
+                try {
+                  await _firestoreService.updateUser(docId, updatedData);
+                  Navigator.pop(context);
+                } catch (e) {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Update failed: $e')),
+                  );
+                  print(e);
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteTeacher(BuildContext context, String docId) async {
+    try {
+      await _firestoreService.deleteUser(docId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Teacher deleted successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error deleting teacher: $e')),
       );
     }
   }

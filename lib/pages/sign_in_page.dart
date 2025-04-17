@@ -66,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
         } else if (userData['role'] == 'Student') {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Mainhomepage()),
+            MaterialPageRoute(builder: (context) => Mainhomepage( studentData: userData,userId: userId,)),
           );
         } else if (userData['role'] == 'Teacher') {
           Navigator.push(

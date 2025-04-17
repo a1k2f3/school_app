@@ -6,8 +6,14 @@ import 'package:school_app/pages/settings.dart';
 import 'package:school_app/pages/upcomming_event.dart';
 
 class Mainhomepage extends StatefulWidget {
-  const Mainhomepage({super.key});
+  final Map<String, dynamic> studentData;
+  final String userId;
 
+  const Mainhomepage({
+    required this.studentData,
+    required this.userId,
+    Key? key,
+  }) : super(key: key);
   @override
   _LengthConverterState createState() => _LengthConverterState();
 }
@@ -16,13 +22,15 @@ class _LengthConverterState extends State<Mainhomepage> {
   int _selectedIndex = 0;
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+      
+        get userData => null;
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
     if(index == 0){
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Mainhomepage()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Mainhomepage( studentData: userData, userId:userData,)));
     } else if(index == 2){
       Navigator.push(context, MaterialPageRoute(builder: (context) => Profile()));
     }
@@ -33,6 +41,8 @@ class _LengthConverterState extends State<Mainhomepage> {
 
   @override
   Widget build(BuildContext context) {
+    widget.studentData['FirstName'] ;  // or whatever your key is
+widget.studentData['email'];
     return Scaffold(
       backgroundColor: const Color(0xFFF1F5F9),  // Light grey background
       body: SingleChildScrollView(
@@ -57,12 +67,12 @@ class _LengthConverterState extends State<Mainhomepage> {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        "John Doe",
+                        widget.studentData['firstName']?? "No Name" ,
                         style: TextStyle(
                             fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black),
                       ),
                       Text(
-                        "Roll No: 2024-ERP-001",
+                        widget.studentData['email'] ?? "No Email",
                         style: TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                       SizedBox(height: 20),

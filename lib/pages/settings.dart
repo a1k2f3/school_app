@@ -14,12 +14,14 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
-  final int _selectedIndex = 1; // Set default to settings
+  final int _selectedIndex = 1;
+  
+  get userData => null; // Set default to settings
 
   void _onItemTapped(int index) {
     if (index == 0) {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Mainhomepage()));
+          context, MaterialPageRoute(builder: (context) => Mainhomepage( studentData: userData, userId: '',)));
     } else if (index == 2) {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => Profile()));
