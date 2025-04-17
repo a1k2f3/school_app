@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:school_app/login_page.dart';
+import 'package:school_app/pages/sign_in_page.dart';
+// import 'package:school_app/login_page.dart';
 import 'package:school_app/service/firestore_service.dart';
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
