@@ -31,14 +31,41 @@ class FirestoreService {
     throw Exception('Error logging in user: $e');
   }
 }
-  Future<List<Map<String, dynamic>>> readUsers() async {
+ Future<List<Map<String, dynamic>>> readUsers() async {
+  try {
+    QuerySnapshot snapshot = await _firestore
+        .collection('users')
+        .where('role', isEqualTo: 'Student') // 👈 filter by role
+        .get();
+
+    return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+  } catch (e) {
+    throw Exception('Error reading users: $e');
+  }
+}
+ Future<List<Map<String, dynamic>>> readAllUsers() async {
     try {
       QuerySnapshot snapshot = await _firestore.collection('users').get();
       return snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
     } catch (e) {
       throw Exception('Error reading users: $e');
     }
+  }   
+
+Future<Map<String, dynamic>?> readUserById(String userId) async {
+  try {
+    DocumentSnapshot doc = await _firestore.collection('users').doc(userId).get();
+    if (doc.exists) {
+      return doc.data() as Map<String, dynamic>;
+    } else {
+      return null; // or throw Exception('User not found');
+    }
+  } catch (e) {
+    throw Exception('Error reading user: $e');
   }
+}
+
+
   Future<void> updateUser(String docId, Map<String, dynamic> updatedData) async {
     try {
       await _firestore.collection('users').doc(docId).update(updatedData);

@@ -2,24 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:school_app/pages/mainhomepage.dart';
 import 'package:school_app/panel/admin_page.dart';
-
+import 'package:school_app/teacher/pane.dart';
+import 'package:school_app/teacher/profile.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
-
   @override
   _LoginPageState createState() => _LoginPageState();
 }
-
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _roleController = TextEditingController();
-  
   String? _selectedRole;
   bool _obscurePassword = true;
   bool _isLoading = false;
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -33,34 +30,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  // void _login() {
-  //   if (_formKey.currentState!.validate()) {
-  //     // Check if the role is Admin and set predefined credentials
-  //     if (_selectedRole == "Admin") {
-  //       _emailController.text = "akifbutt935@gmail.com";
-  //       _passwordController.text = "123456";
-  //    Navigator.push(
-  //           context, MaterialPageRoute(builder: (context) =>AdminPanelPage()));
-    
-  //     }
-
-  //     setState(() {
-  //       _isLoading = true;
-  //     });
-
-  //     Future.delayed(const Duration(seconds: 2), () {
-  //       setState(() {
-  //         _isLoading = false;
-  //       });
-
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text("Login Successful")),
-  //       );
-  //       Navigator.push(
-  //           context, MaterialPageRoute(builder: (context) => Mainhomepage()));
-  //     });
-  //   }
-  // }
+  
  Future<void> _login2() async {
   if (_formKey.currentState!.validate()) {
     final email = _emailController.text.trim();
@@ -80,7 +50,10 @@ class _LoginPageState extends State<LoginPage> {
           const SnackBar(content: Text('Invalid email, password, or role')),
         );
       } else {
-        final userData = querySnapshot.docs.first.data();
+        final userDoc = querySnapshot.docs.first;
+        final userData = userDoc.data();
+        final userId = userDoc.id;
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful')),
         );
@@ -90,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
             context,
             MaterialPageRoute(builder: (context) => AdminPanelPage()),
           );
-        } else if(userData['role'] == 'Student') {
+        } else if (userData['role'] == 'Student') {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => Mainhomepage()),
@@ -98,12 +71,12 @@ class _LoginPageState extends State<LoginPage> {
         } else if (userData['role'] == 'Teacher') {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) =>Mainhomepage()),
-          );
-        }
-         else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Role not recognized')),
+            MaterialPageRoute(
+              builder: (context) => ProfilePage(
+                profileData: userData,
+                userId: userId, // ✅ pass the correct user ID
+              ),
+            ),
           );
         }
       }
@@ -114,6 +87,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 }
+
 
   @override
   Widget build(BuildContext context) {

@@ -366,36 +366,19 @@ class _AssignmentState extends State<Assignment> {
       try {
         // Pick admin file
         FilePickerResult? result = await FilePicker.platform.pickFiles();
-        if (result != null) {
-          final file = result.files.single;
-          final filePath = file.path!;
-          final fileName = file.name;
-
-          // Upload file to Firebase Storage
-          final ref = _storage.ref().child('assignments/$fileName');
-          await ref.putFile(File(filePath));
-          final fileUrl = await ref.getDownloadURL();
-
-          // Add assignment to Firestore
-          await _firestore.collection('assignments').add({
+        
+        
+        await _firestore.collection('assignments').add({
             'title': _titleController.text,
             'description': _descriptionController.text,
             'deadline': _deadlineController.text,
             'className': _classNameController.text,
-            'adminFileUrl': fileUrl,
             'userFileUrl': null,
           });
-
           _clearForm();
-
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Assignment added successfully')),
           );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No file selected')),
-          );
-        }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error adding assignment: $e')),
@@ -404,7 +387,6 @@ class _AssignmentState extends State<Assignment> {
       }
     }
   }
-
   Future<void> _uploadUserFile(String docId) async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles();
