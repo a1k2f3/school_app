@@ -1,21 +1,58 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:school_app/firebase_options.dart';
-import 'pages/home_page.dart';
-  Future  <void> main() async {
-WidgetsFlutterBinding.ensureInitialized();
-await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform) ; 
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:school_app/pages/home_page.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(const MyApp());
 }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Suffah school',
+      title: 'Suffah School',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomePage(),
+      home: const SplashScreen(),
     );
   }
 }
+
+// Splash Screen Widget
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Timer(const Duration(seconds: 3), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.blue,
+      body: Center(
+        child: Image.asset('assets/splash_logo.png', height: 120),
+      ),
+    );
+  }
+}
+
+// Home Page Widget
+

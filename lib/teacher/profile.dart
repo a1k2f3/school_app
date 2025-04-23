@@ -1,29 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import './home.dart';
+import 'student.dart';
+import 'Assgiment.dart';
+import './Attendance.dart';
 class ProfilePage extends StatefulWidget {
    final String userId;
   const ProfilePage({Key? key, required this.userId, required Map<String, dynamic> profileData}) : super(key: key);
   @override
   State<ProfilePage> createState() => _ProfilePageState();
 }
-
 class _ProfilePageState extends State<ProfilePage> {
   Map<String, dynamic>? profileData;
+int _selectedIndex = 0;
+
+  final List<Widget> _pages = [
+    HomePage(),
+    StudentsPage(),
+    AssignmentsPage(),
+    AttendancePage(),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() => _selectedIndex = index);
+  }
 
   @override
   void initState() {
     super.initState();
     fetchUser();
   }
-
   Future<void> fetchUser() async {
     try {
       DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('users')
           .doc(widget.userId)
           .get();
-
       if (doc.exists) {
         setState(() {
           profileData = doc.data() as Map<String, dynamic>;
@@ -36,7 +48,6 @@ class _ProfilePageState extends State<ProfilePage> {
       print('Error fetching user: $e');
     }
   }
-
   @override
   Widget build(BuildContext context) {
     if (profileData == null) {
@@ -44,7 +55,6 @@ class _ProfilePageState extends State<ProfilePage> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
-
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: SingleChildScrollView(
@@ -67,7 +77,6 @@ class _ProfilePageState extends State<ProfilePage> {
             _buildInfoTile("Phone", profileData!['phone'] ?? ''),
             _buildInfoTile("Gender", profileData!['gender'] ?? ''),
             _buildInfoTile("Date of Birth", profileData!['dob'] ?? ''),
-
             const SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () {
@@ -83,6 +92,20 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ],
         ),
+       
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        unselectedItemColor: Colors.grey,
+        selectedItemColor: Colors.indigo,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.school), label: 'Students'),
+          BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Assignments'),
+          BottomNavigationBarItem(icon: Icon(Icons.check_circle), label: 'Attendance'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
       ),
     );
   }
@@ -94,7 +117,6 @@ class _ProfilePageState extends State<ProfilePage> {
       leading: Icon(_getIcon(label), color: Colors.indigo),
     );
   }
-
   IconData _getIcon(String label) {
     switch (label) {
       case "Email":
