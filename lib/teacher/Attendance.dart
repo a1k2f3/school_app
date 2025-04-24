@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AttendancePage extends StatefulWidget {
   @override
@@ -6,13 +7,41 @@ class AttendancePage extends StatefulWidget {
 }
 
 class _AttendancePageState extends State<AttendancePage> {
-  final List<Map<String, dynamic>> students = [
-    {'name': 'Ali Raza', 'id': 'STU001', 'present': false},
-    {'name': 'Ayesha Khan', 'id': 'STU002', 'present': false},
-    {'name': 'Hassan Tariq', 'id': 'STU003', 'present': false},
-    {'name': 'Zara Ahmed', 'id': 'STU004', 'present': false},
-    {'name': 'Fatima Malik', 'id': 'STU005', 'present': false},
-  ];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  List<Map<String, dynamic>> students = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchStudents();
+  }
+
+  Future<void> fetchStudents() async {
+    try {
+      final snapshot = await _firestore
+          .collection('users')
+          .where('role', isEqualTo: 'Student')
+          .get();
+
+      final data = snapshot.docs.map((doc) {
+        final user = doc.data();
+        return {
+          'id': doc.id,
+          'name': user['firstName'],
+          'present': false,
+        };
+      }).toList();
+
+      setState(() {
+        students = data;
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error fetching students: $e");
+    }
+  }
 
   String getTodayDate() {
     final now = DateTime.now();
@@ -25,52 +54,85 @@ class _AttendancePageState extends State<AttendancePage> {
     });
   }
 
+  Future<void> submitAttendance() async {
+    final today = getTodayDate();
+
+    for (var student in students) {
+      final attendanceData = {
+        'studentId': student['id'],
+        'name': student['name'],
+        'present': student['present'],
+        'date': today,
+      };
+
+      try {
+        await _firestore.collection('attendance').add(attendanceData);
+      } catch (e) {
+        print("Error saving attendance: $e");
+      }
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Attendance submitted for ${students.length} students.")),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Attendance", style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 6),
-            Text("Date: ${getTodayDate()}", style: TextStyle(color: Colors.grey[600])),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: students.length,
-                itemBuilder: (context, index) {
-                  final student = students[index];
-                  return Card(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 2,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.indigo,
-                        child: Text(
-                          student['name'][0],
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      title: Text(student['name'], style: TextStyle(fontWeight: FontWeight.w600)),
-                      subtitle: Text(student['id']),
-                      trailing: Switch(
-                        value: student['present'],
-                        onChanged: (_) => toggleAttendance(index),
-                        activeColor: Colors.green,
-                      ),
+      appBar: AppBar(
+        title: const Text('Attendance'),
+        backgroundColor: Colors.indigo,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            onPressed: submitAttendance,
+          )
+        ],
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Date: ${getTodayDate()}", style: TextStyle(color: Colors.grey[600])),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: students.length,
+                      itemBuilder: (context, index) {
+                        final student = students[index];
+                        return Card(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 2,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            leading: CircleAvatar(
+                              backgroundColor: Colors.indigo,
+                              child: Text(
+                                student['name'][0],
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            title: Text(student['name'], style: const TextStyle(fontWeight: FontWeight.w600)),
+                            subtitle: Text("ID: ${student['id']}"),
+                            trailing: Switch(
+                              value: student['present'],
+                              onChanged: (_) => toggleAttendance(index),
+                              activeColor: Colors.green,
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

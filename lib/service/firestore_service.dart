@@ -77,7 +77,14 @@ class FirestoreService {
       throw Exception('Error updating user: $e');
     }
   }
-
+// create the attendence query in fire base to add tthe attendance of the students  
+  Future<void> createAttendance(Map<String, dynamic> attendanceData) async {
+    try {
+      await _firestore.collection('attendance').add(attendanceData);
+    } catch (e) {
+      throw Exception('Error creating attendance: $e');
+    }
+  }
   Future<void> deleteUser(String docId) async {
     try {
       await _firestore.collection('users').doc(docId).delete();

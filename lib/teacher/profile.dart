@@ -4,6 +4,7 @@ import './home.dart';
 import 'student.dart';
 import 'Assgiment.dart';
 import './Attendance.dart';
+import './editprofile.dart';
 
 class ProfilePage extends StatefulWidget {
   final String userId;
@@ -78,13 +79,27 @@ class _ProfilePageState extends State<ProfilePage> {
           _buildInfoTile("Date of Birth", profileData!['dob'] ?? ''),
           const SizedBox(height: 20),
           ElevatedButton.icon(
-            onPressed: () {
-              // Navigate to Edit Profile Page (optional)
-            },
-            icon: const Icon(Icons.edit),
+            onPressed: () async {
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => EditProfilePage(
+        userId: widget.userId,
+        profileData: profileData!,
+      ),
+    ),
+  );
+
+  // Reload user if updated
+  if (result == true) {
+    fetchUser();
+  }
+},
+
+          icon: const Icon(Icons.edit),
             label: const Text("Edit Profile"),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.indigo,
+              backgroundColor: const Color.fromARGB(255, 6, 214, 33),
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),

@@ -481,6 +481,13 @@ class _AssignmentState extends State<Assignment> {
                     validator: (value) =>
                         value!.isEmpty ? 'Class Name is required' : null,
                   ),
+                  TextFormField(
+                    controller: _subjectcontroller,
+                    decoration: const InputDecoration(labelText: 'Subject'),
+                    validator: (value) =>
+                        value!.isEmpty ? 'Subject is required' : null,
+                  ),
+                 
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: _addAssignment,
