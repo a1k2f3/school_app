@@ -351,19 +351,18 @@ class _AssignmentState extends State<Assignment> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _deadlineController = TextEditingController();
   final TextEditingController _classNameController = TextEditingController();
-
+  final TextEditingController _subjectcontroller = TextEditingController();
   Future<void> _addAssignment() async {
     if (_formKey.currentState!.validate()) {
       try {
-        // Pick admin file
-        FilePickerResult? result = await FilePicker.platform.pickFiles();
-        
-        
+        FilePickerResult? result=await FilePicker.platform.pickFiles();
         await _firestore.collection('assignments').add({
             'title': _titleController.text,
             'description': _descriptionController.text,
             'deadline': _deadlineController.text,
             'className': _classNameController.text,
+            'subject': _subjectcontroller.text,
+            'status': 'Pending',
             'userFileUrl': null,
           });
           _clearForm();

@@ -35,8 +35,13 @@ class _TeacherPanelState extends State<TeacherPanel> {
     StudentsPage(),
     AssignmentsPage(),
     AttendancePage(),
-//  ProfilePage(userId: '12345'), // Replace with actual user ID
+ ProfilePage  ( profileData: userData,
+                userId: userId,), // Replace with actual user ID
   ];
+  
+  static get userData => null;
+  
+  static get userId => null;
 
   void _onItemTapped(int index) {
     setState(() => _selectedIndex = index);
