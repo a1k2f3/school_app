@@ -15,7 +15,7 @@ class _AttendancePageState extends State<AttendancePage> {
   @override
   void initState() {
     super.initState();
-    fetchStudents();
+    fetchStudents().then((_) => calculateStudentAttendancePercentage());
   }
 
   Future<void> fetchStudents() async {
@@ -31,6 +31,7 @@ class _AttendancePageState extends State<AttendancePage> {
           'id': doc.id,
           'name': user['firstName'],
           'present': false,
+          'attendancePercentage': 0.0,
         };
       }).toList();
 
@@ -40,6 +41,32 @@ class _AttendancePageState extends State<AttendancePage> {
       });
     } catch (e) {
       print("Error fetching students: $e");
+    }
+  }
+
+  Future<void> calculateStudentAttendancePercentage() async {
+    for (int i = 0; i < students.length; i++) {
+      final studentId = students[i]['id'];
+
+      try {
+        final querySnapshot = await _firestore
+            .collection('attendance')
+            .where('studentId', isEqualTo: studentId)
+            .get();
+
+        final total = querySnapshot.docs.length;
+        final present = querySnapshot.docs
+            .where((doc) => doc['present'] == true)
+            .length;
+
+        double percentage = total > 0 ? (present / total) * 100 : 0;
+
+        setState(() {
+          students[i]['attendancePercentage'] = percentage;
+        });
+      } catch (e) {
+        print("Error fetching attendance for student $studentId: $e");
+      }
     }
   }
 
@@ -73,8 +100,19 @@ class _AttendancePageState extends State<AttendancePage> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Attendance submitted for ${students.length} students.")),
+      SnackBar(
+          content:
+              Text("Attendance submitted for ${students.length} students.")),
     );
+
+    // Recalculate percentages after submitting
+    calculateStudentAttendancePercentage();
+  }
+
+  double calculateTodayPercentage() {
+    if (students.isEmpty) return 0;
+    int presentCount = students.where((s) => s['present'] == true).length;
+    return (presentCount / students.length) * 100;
   }
 
   @override
@@ -98,7 +136,16 @@ class _AttendancePageState extends State<AttendancePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Date: ${getTodayDate()}", style: TextStyle(color: Colors.grey[600])),
+                  Text("Date: ${getTodayDate()}",
+                      style: TextStyle(color: Colors.grey[600])),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Today's Present: ${calculateTodayPercentage().toStringAsFixed(1)}%",
+                    style: const TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16),
+                  ),
                   const SizedBox(height: 16),
                   Expanded(
                     child: ListView.builder(
@@ -106,11 +153,13 @@ class _AttendancePageState extends State<AttendancePage> {
                       itemBuilder: (context, index) {
                         final student = students[index];
                         return Card(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                           elevation: 2,
                           margin: const EdgeInsets.symmetric(vertical: 8),
                           child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
                             leading: CircleAvatar(
                               backgroundColor: Colors.indigo,
                               child: Text(
@@ -118,8 +167,17 @@ class _AttendancePageState extends State<AttendancePage> {
                                 style: const TextStyle(color: Colors.white),
                               ),
                             ),
-                            title: Text(student['name'], style: const TextStyle(fontWeight: FontWeight.w600)),
-                            subtitle: Text("ID: ${student['id']}"),
+                            title: Text(student['name'],
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600)),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("ID: ${student['id']}"),
+                                Text(
+                                    "Overall: ${student['attendancePercentage'].toStringAsFixed(1)}%"),
+                              ],
+                            ),
                             trailing: Switch(
                               value: student['present'],
                               onChanged: (_) => toggleAttendance(index),

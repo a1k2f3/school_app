@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:school_app/service/firestore_service.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+// import 'your_service_path/firestore_service.dart'; // <<--- ADD this line (update the path)
 
 class CoursePage extends StatefulWidget {
   const CoursePage({super.key});
@@ -12,17 +14,20 @@ class _CoursePageState extends State<CoursePage> {
   double attendancePercentage = 85.0; // Example attendance value
   double courseProgress = 0.6; // 60% completion
 
-  // Sample Video Lessons (YouTube)
   final List<String> videoIds = [
     "dQw4w9WgXcQ", // Replace with actual course video IDs
     "tgbNymZ7vqY",
   ];
 
   late YoutubePlayerController _youtubeController;
+  late Future<List<Map<String, dynamic>>> _coursesFuture; // <<--- ADD this line
 
   @override
   void initState() {
-    // super.initState();
+    super.initState(); // <<--- uncomment this
+
+    _coursesFuture = FirestoreService().readCourse(); // <<--- ADD this line
+
     _youtubeController = YoutubePlayerController(
       initialVideoId: videoIds[0],
       flags: YoutubePlayerFlags(autoPlay: true),
@@ -48,22 +53,12 @@ class _CoursePageState extends State<CoursePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Attendance & Progress Overview
             _buildAttendanceAndProgress(),
-
             SizedBox(height: 20),
-
-            // Daily Work
             _buildDailyWork(),
-
             SizedBox(height: 20),
-
-            // Course Outline
-            _buildCourseOutline(),
-
+            _buildCourseOutline(), // <<< Here it is replaced
             SizedBox(height: 20),
-
-            // Video Lessons
             _buildVideoLessons(),
           ],
         ),
@@ -71,7 +66,6 @@ class _CoursePageState extends State<CoursePage> {
     );
   }
 
-  // Attendance and Progress Card
   Widget _buildAttendanceAndProgress() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -81,7 +75,6 @@ class _CoursePageState extends State<CoursePage> {
         padding: EdgeInsets.all(16),
         child: Column(
           children: [
-            // Attendance Progress
             Text("Attendance", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             LinearProgressIndicator(
@@ -93,10 +86,7 @@ class _CoursePageState extends State<CoursePage> {
             SizedBox(height: 8),
             Text("${attendancePercentage.toStringAsFixed(1)}% Attended",
                 style: TextStyle(fontSize: 16)),
-
             Divider(),
-
-            // Course Progress Tracker
             Text("Course Progress", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             CircularPercentIndicator(
@@ -113,7 +103,6 @@ class _CoursePageState extends State<CoursePage> {
     );
   }
 
-  // Daily Work Summary
   Widget _buildDailyWork() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -134,7 +123,6 @@ class _CoursePageState extends State<CoursePage> {
     );
   }
 
-  // Task List with Checkboxes
   Widget _buildTask(String taskName, bool isCompleted) {
     return ListTile(
       leading: Icon(
@@ -145,33 +133,49 @@ class _CoursePageState extends State<CoursePage> {
     );
   }
 
-  // Course Outline
+  // 🔵 Updated to fetch from Firestore
   Widget _buildCourseOutline() {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 4,
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("📜 Course Outline", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            ExpansionTile(
-              title: Text("Module 1: Introduction"),
-              children: [ListTile(title: Text("Lesson 1: Basics of Flutter")), ListTile(title: Text("Lesson 2: UI Components"))],
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: _coursesFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Text('Error loading course outline');
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Text('No course outline available');
+        } else {
+          final courses = snapshot.data!;
+          return Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            elevation: 4,
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("📜 Course Outline", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 10),
+                  ...courses.map((course) {
+                    return ExpansionTile(
+                      title: Text(course['courseName'] ?? 'No Title'),
+                      children: [
+                        if (course['lessons'] != null)
+                          ...List<Widget>.from((course['lessons'] as List<dynamic>).map((lesson) => ListTile(
+                                title: Text(lesson),
+                              )))
+                      ],
+                    );
+                  }).toList(),
+                ],
+              ),
             ),
-            ExpansionTile(
-              title: Text("Module 2: Advanced Topics"),
-              children: [ListTile(title: Text("Lesson 3: State Management")), ListTile(title: Text("Lesson 4: API Integration"))],
-            ),
-          ],
-        ),
-      ),
+          );
+        }
+      },
     );
   }
 
-  // Video Lessons
   Widget _buildVideoLessons() {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

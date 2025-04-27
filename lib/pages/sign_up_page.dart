@@ -18,7 +18,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _nationalityController = TextEditingController();
   final TextEditingController _classController = TextEditingController();
   final TextEditingController _qualification = TextEditingController();
-  String? _selectedRole;
+  String? _selectedRole;    
   String? _selectedGender;
   String? _selectedBloodGroup;
   final FirestoreService _firestoreService = FirestoreService();

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:school_app/service/firestore_service.dart';
 import 'package:school_app/teacher/pane.dart'; // For kIsWeb
 // import 'package:file_picker/file_picker.dart';
+import 'package:school_app/panel/readcomplaintpage.dart';
 class AdminPanelPage extends StatelessWidget {
   const AdminPanelPage({super.key});
 
@@ -51,6 +51,10 @@ class AdminPanelPage extends StatelessWidget {
               },
               child: const Text("Teacher Manegment"),
             ),
+     const SizedBox(height: 10),
+     
+     const SizedBox(height: 10),
+            
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
@@ -62,6 +66,18 @@ class AdminPanelPage extends StatelessWidget {
                 );
               },
               child: const Text("Assign classes"),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AdminMessagesPage(),
+                  ),
+                );
+              },
+              child: const Text("complaints"),
             ),
             const SizedBox(height: 10),
             ElevatedButton(

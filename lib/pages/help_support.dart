@@ -1,8 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(HelpSupportApp());
-}
 
 class HelpSupportApp extends StatelessWidget {
   const HelpSupportApp({super.key});
@@ -111,7 +109,7 @@ class FAQSection extends StatelessWidget {
     // Add more FAQ items as needed.
   ];
 
-   FAQSection({super.key});
+  FAQSection({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -227,6 +225,10 @@ class _ContactFormSectionState extends State<ContactFormSection> {
   String email = '';
   String message = '';
 
+  bool isLoading = false; // NEW: For showing loading indicator
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;  // Firestore instance
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -292,20 +294,55 @@ class _ContactFormSectionState extends State<ContactFormSection> {
           SizedBox(height: 10),
 
           // Send Message button
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                _formKey.currentState!.save();
-                // Process the form submission (e.g., send data to a server)
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Message sent!')),
-                );
-              }
-            },
-            child: Text('Send Message'),
-          )
+          isLoading
+              ? CircularProgressIndicator()  // NEW: Show loading while sending
+              : ElevatedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      _formKey.currentState!.save();
+
+                      setState(() {
+                        isLoading = true;
+                      });
+
+                      try {
+                        // Send message data to Firestore
+                        await createMessage({
+                          'name': name,
+                          'email': email,
+                          'message': message,
+                          'timestamp': DateTime.now(),
+                        });
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Message sent successfully!')),
+                        );
+
+                        _formKey.currentState!.reset();
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to send message: $e')),
+                        );
+                      } finally {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    }
+                  },
+                  child: Text('Send Message'),
+                )
         ],
       ),
     );
+  }
+
+  // Function to send the message data to Firestore
+  Future<void> createMessage(Map<String, dynamic> messageData) async {
+    try {
+      await _firestore.collection('messages').add(messageData);  // Firestore interaction
+    } catch (e) {
+      throw Exception('Error creating message: $e');
+    }
   }
 }

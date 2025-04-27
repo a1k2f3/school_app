@@ -6,41 +6,57 @@ import 'package:school_app/pages/profile.dart';
 import 'package:school_app/pages/mainhomepage.dart';
 import 'package:school_app/pages/second_page.dart';
 
-class Settings extends StatefulWidget {
-  const Settings({super.key});
+class Setting extends StatefulWidget {
+  final dynamic studentData;
+  final String userId;
+
+  const Setting({super.key, required this.studentData, required this.userId});
 
   @override
   _SettingsState createState() => _SettingsState();
 }
 
-class _SettingsState extends State<Settings> {
-  final int _selectedIndex = 1;
-  
-  get userData => null; // Set default to settings
+class _SettingsState extends State<Setting> {
+  int _selectedIndex = 1;
 
   void _onItemTapped(int index) {
     if (index == 0) {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Mainhomepage( studentData: userData, userId: '',)));
+        context,
+        MaterialPageRoute(
+          builder: (context) => Mainhomepage(
+            studentData: widget.studentData,
+            userId: widget.userId,
+          ),
+        ),
+      );
     } else if (index == 2) {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Profile()));
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Profile(
+            studentData: widget.studentData,
+            userId: widget.userId,
+          ),
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final student = widget.studentData;
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9), // Light grey background
+      backgroundColor: const Color(0xFFF1F5F9),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
-              // Profile Card with gradient background
+              // Profile Card
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.blueAccent,
                   borderRadius: BorderRadius.circular(15),
                   boxShadow: [
                     BoxShadow(
@@ -57,46 +73,97 @@ class _SettingsState extends State<Settings> {
                     CircleAvatar(
                       radius: 60,
                       backgroundImage: NetworkImage(
-                          "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png"),
+                        "https://upload.wikimedia.org/wikipedia/commons/9/99/Sample_User_Icon.png",
+                      ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Text(
-                      "John Doe",
-                      style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                      student?['firstName'] ?? "No Name",
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                     Text(
-                      "Roll No: 2024-ERP-001",
-                      style: TextStyle(fontSize: 16, color: Colors.white70),
+                      student?['email'] ?? "No Email",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white70,
+                      ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-              // Settings Options List
-              _buildSettingOption(Icons.person, "Profile Setting", () {Navigator.push(context, MaterialPageRoute(builder: (context) =>  Profile()));}),
-              _buildSettingOption(Icons.lock, "Account & Security", () { Navigator.push(context, MaterialPageRoute(builder: (context) =>  AccountSecurityApp()));}),
+              // Settings Options
               _buildSettingOption(
-                  Icons.notifications, "Notification Preferences", () { Navigator.push(context, MaterialPageRoute(builder: (context) =>  NotificationPreferenceApp()));}),
-              _buildSettingOption(Icons.update, "Theme & Customization", () { Navigator.push(context, MaterialPageRoute(builder: (context) =>  SchoolApp()));}),
-              _buildSettingOption(Icons.logout, "Logout & Account Management",
-                  () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) =>   SecondPage()));
-              }),
+                Icons.person,
+                "Profile Setting",
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Profile(
+                        studentData: widget.studentData,
+                        userId: widget.userId,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _buildSettingOption(
+                Icons.lock,
+                "Account & Security",
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AccountSecurityApp()),
+                  );
+                },
+              ),
+              _buildSettingOption(
+                Icons.notifications,
+                "Notification Preferences",
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => NotificationPreferenceApp()),
+                  );
+                },
+              ),
+              _buildSettingOption(
+                Icons.update,
+                "Theme & Customization",
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SchoolApp()),
+                  );
+                },
+              ),
+              _buildSettingOption(
+                Icons.logout,
+                "Logout & Account Management",
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SecondPage()),
+                  );
+                },
+              ),
             ],
           ),
         ),
       ),
       bottomNavigationBar: Container(
-        margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
           color: Colors.blueAccent,
           borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(             
+          boxShadow: const [
+            BoxShadow(
               blurRadius: 10,
               spreadRadius: 2,
             ),
@@ -107,8 +174,7 @@ class _SettingsState extends State<Settings> {
           child: BottomNavigationBar(
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.settings), label: 'Settings'),
+              BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
               BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
             ],
             currentIndex: _selectedIndex,
@@ -123,7 +189,6 @@ class _SettingsState extends State<Settings> {
     );
   }
 
-  // Custom Method to Build Setting Options
   Widget _buildSettingOption(IconData icon, String title, VoidCallback onTap) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -131,9 +196,11 @@ class _SettingsState extends State<Settings> {
       color: Colors.white,
       child: ListTile(
         leading: Icon(icon, color: Colors.blueAccent),
-        title: Text(title,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-        trailing: Icon(Icons.arrow_forward_ios, color: Colors.blueAccent),
+        title: Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+        ),
+        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.blueAccent),
         onTap: onTap,
       ),
     );

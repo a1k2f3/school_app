@@ -69,7 +69,6 @@ class FirestoreService {
       throw Exception('Error reading user: $e');
     }
   }
-
   Future<void> updateUser(String docId, Map<String, dynamic> updatedData) async {
     try {
       await _firestore.collection('users').doc(docId).update(updatedData);
@@ -85,6 +84,8 @@ class FirestoreService {
       throw Exception('Error creating attendance: $e');
     }
   }
+  // create read the attandence     
+   
   Future<void> deleteUser(String docId) async {
     try {
       await _firestore.collection('users').doc(docId).delete();
@@ -197,7 +198,39 @@ class FirestoreService {
       throw Exception('Error deleting assignment: $e');
     }
   }
-
+//  user can send th message in the chat
+  Future<void> createMessage(Map<String, dynamic> messageData) async {
+    try {
+      await _firestore.collection('messages').add(messageData);
+    } catch (e) {
+      throw Exception('Error creating message: $e');
+    }
+  }
+  // read message from the chat
+  Future<List<Map<String, dynamic>>> readMessage() async {
+    try {
+      final snapshot = await _firestore.collection('messages').get();
+      return snapshot.docs.map(_mapDocWithId).toList();
+    } catch (e) {
+      throw Exception('Error reading messages: $e');
+    }
+  }
+  Future<void> updateMessage(String docId, Map<String, dynamic> updatedData) async {
+    try {
+      await _firestore.collection('messages').doc(docId).update(updatedData);
+    } catch (e) {
+      throw Exception('Error updating message: $e');
+    }
+  }
+  Future<void> deleteMessage(String docId) async {
+    try {
+      await _firestore.collection('messages').doc(docId).delete();
+    } catch (e) {
+      throw Exception('Error deleting message: $e');
+    }
+  }
+  // ------------------ ATTENDANCE ------------------
+  
   // ------------------ HELPER ------------------
 
   Map<String, dynamic> _mapDocWithId(QueryDocumentSnapshot doc) {
