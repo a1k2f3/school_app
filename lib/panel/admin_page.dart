@@ -5,7 +5,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:school_app/service/firestore_service.dart';
-import 'package:school_app/teacher/pane.dart'; // For kIsWeb
+import 'package:school_app/teacher/pane.dart'; 
+import 'package:school_app/panel/feemanegment.dart';// For kIsWeb
 // import 'package:file_picker/file_picker.dart';
 import 'package:school_app/panel/readcomplaintpage.dart';
 class AdminPanelPage extends StatelessWidget {
@@ -51,7 +52,19 @@ class AdminPanelPage extends StatelessWidget {
               },
               child: const Text("Teacher Manegment"),
             ),
-     const SizedBox(height: 10),
+ const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FeeManagementPage(),
+                  ),
+                );
+              },
+              child: const Text("Fee manegment"),
+            ),
+    
      
      const SizedBox(height: 10),
             

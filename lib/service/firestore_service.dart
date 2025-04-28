@@ -215,6 +215,7 @@ class FirestoreService {
       throw Exception('Error reading messages: $e');
     }
   }
+  // 
   Future<void> updateMessage(String docId, Map<String, dynamic> updatedData) async {
     try {
       await _firestore.collection('messages').doc(docId).update(updatedData);
@@ -229,8 +230,44 @@ class FirestoreService {
       throw Exception('Error deleting message: $e');
     }
   }
+  // add fee 
+  Future<void> createFee(Map<String, dynamic> feeData) async {
+    try {
+      await _firestore.collection('fee').add(feeData);
+    } catch (e) {
+      throw Exception('Error creating fee: $e');
+    }
+  }
+  // update status of the fee
+  Future<List<Map<String, dynamic>>> readFee() async {
+    try {
+      final snapshot = await _firestore.collection('fee').get();
+      return snapshot.docs.map(_mapDocWithId).toList();
+    } catch (e) {
+      throw Exception('Error reading fee: $e');
+    }
+  }
+  // read the fee of the student
+  Future<List<Map<String, dynamic>>> readFeeByStudentId(String studentId) async {
+    try {
+      final snapshot = await _firestore
+          .collection('fee')
+          .where('studentId', isEqualTo: studentId)
+          .get();
+      return snapshot.docs.map(_mapDocWithId).toList();
+    } catch (e) {
+      throw Exception('Error reading fee by student ID: $e');
+    }
+  }
+  Future<void> updateFee(String docId, Map<String, dynamic> updatedData) async {
+    try {
+      await _firestore.collection('fee').doc(docId).update(updatedData);
+    } catch (e) {
+      throw Exception('Error updating fee: $e');
+    }
+  }
   // ------------------ ATTENDANCE ------------------
-  
+
   // ------------------ HELPER ------------------
 
   Map<String, dynamic> _mapDocWithId(QueryDocumentSnapshot doc) {
