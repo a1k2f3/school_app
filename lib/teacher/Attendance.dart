@@ -74,7 +74,6 @@ class _AttendancePageState extends State<AttendancePage> {
     final now = DateTime.now();
     return "${now.day}-${now.month}-${now.year}";
   }
-
   void toggleAttendance(int index) {
     setState(() {
       students[index]['present'] = !students[index]['present'];

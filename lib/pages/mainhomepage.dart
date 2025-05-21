@@ -5,17 +5,14 @@ import 'package:school_app/pages/help_support.dart';
 import 'package:school_app/pages/profile.dart';
 import 'package:school_app/pages/settings.dart';
 import 'package:school_app/pages/upcomming_event.dart';
-
 class Mainhomepage extends StatefulWidget {
   final Map<String, dynamic> studentData;
   final String userId;
-
   const Mainhomepage({
     required this.studentData,
     required this.userId,
     Key? key,
   }) : super(key: key);
-
   @override
   _MainhomepageState createState() => _MainhomepageState();
 }
@@ -35,6 +32,25 @@ class _MainhomepageState extends State<Mainhomepage> {
       throw Exception('Error fetching courses: $e');
     }
   }
+
+Future<List<Map<String, dynamic>>> fetchFee() async {
+  try {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.userId)
+        .collection('fees')
+        .get(); // <- use get() instead of snapshots()
+
+    return snapshot.docs.map((doc) {
+      return {
+        'id': doc.id,
+        ...doc.data(), // spreading the fee fields
+      };
+    }).toList();
+  } catch (e) {
+    throw Exception('Error fetching fee data: $e');
+  }
+}
 
   void _onItemTapped(int index) {
     setState(() {
@@ -96,28 +112,46 @@ class _MainhomepageState extends State<Mainhomepage> {
                         style: const TextStyle(fontSize: 16, color: Colors.grey),
                       ),
                       const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.school, color: Colors.green),
-                          SizedBox(width: 8),
-                          Text("Academics: Good", style: TextStyle(fontSize: 18, color: Colors.black)),
-                        ],
-                      ),
+                     Row(
+  mainAxisAlignment: MainAxisAlignment.center,
+  children: [
+    const Icon(Icons.attach_money, color: Colors.red),
+    const SizedBox(width: 8),
+    FutureBuilder<List<Map<String, dynamic>>>( 
+      future: fetchFee(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator(strokeWidth: 2); // Small loader
+        } else if (snapshot.hasError) {
+          return const Text("Error loading dues", style: TextStyle(fontSize: 18, color: Colors.red));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const SizedBox.shrink(); // Don't display anything if no dues are present
+        }
+
+        // Calculate total pending amount
+        final pendingFees = snapshot.data!
+            .where((fee) => (fee['status'] ?? '').toLowerCase() != 'paid')
+            .toList();
+
+        if (pendingFees.isEmpty) {
+          return const SizedBox.shrink(); // Don't display anything if no pending dues
+        }
+
+        final totalPending = pendingFees.fold(0, (sum, fee) {
+          return sum + (int.tryParse(fee['amount'].toString()) ?? 0);
+        });
+
+        return Text(
+          "Pending Dues: $totalPending",
+          style: const TextStyle(fontSize: 18, color: Colors.black),
+        );
+      },
+    ),
+  ],
+),
+
                       const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.attach_money, color: Colors.red),
-                          SizedBox(width: 8),
-                          Text("Pending Dues: 2000", style: TextStyle(fontSize: 18, color: Colors.black)),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      const Text(
-                        "Last Date: 2025-03-07",
-                        style: TextStyle(fontSize: 16, color: Colors.red),
-                      ),
+                      
                       const Text(
                         "Days Left: 17",
                         style: TextStyle(fontSize: 16, color: Colors.red),

@@ -20,6 +20,20 @@ class _FeeManagementPageState extends State<FeeManagementPage> {
     }
   }
 
+  Future<void> updateFeeStatus(String userId, String feeId, String newStatus) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('fees')
+          .doc(feeId)
+          .update({'status': newStatus});
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fee status updated")));
+    } catch (e) {
+      throw Exception('Error updating fee status: $e');
+    }
+  }
+
   Future<List<Map<String, dynamic>>> readAllStudents() async {
     try {
       final snapshot = await _firestore
@@ -94,7 +108,7 @@ class _FeeManagementPageState extends State<FeeManagementPage> {
                                   final feeData = {
                                     'amount': _feeAmountController.text,
                                     'dueDate': _dueDateController.text,
-                                    'status': 'unpaid', // 🟡 New field
+                                    'status': 'unpaid', // New field
                                   };
                                   await createFee(student['id'], feeData);
                                 } else {
@@ -126,7 +140,31 @@ class _FeeManagementPageState extends State<FeeManagementPage> {
                                     final fee = feeSnapshot.data!.docs[feeIndex];
                                     return ListTile(
                                       title: Text("Amount: ${fee['amount']}"),
-                                      subtitle: Text("Due: ${fee['dueDate']} - Status: ${fee['status']}"),
+                                      subtitle: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Due: ${fee['dueDate']}"),
+                                          Row(
+                                            children: [
+                                              Text("Status: "),
+                                              DropdownButton<String>(
+                                                value: fee['status'],
+                                                items: ['unpaid', 'paid', 'late'] // You can add more statuses
+                                                    .map((status) => DropdownMenuItem(
+                                                          value: status,
+                                                          child: Text(status),
+                                                        ))
+                                                    .toList(),
+                                                onChanged: (newStatus) async {
+                                                  if (newStatus != null) {
+                                                    await updateFeeStatus(student['id'], fee.id, newStatus);
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     );
                                   },
                                 );

@@ -36,7 +36,6 @@ class _LoginPageState extends State<LoginPage> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
     final role = _selectedRole;
-
     try {
       final querySnapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -44,7 +43,6 @@ class _LoginPageState extends State<LoginPage> {
           .where('password', isEqualTo: password)
           .where('role', isEqualTo: role)
           .get();
-
       if (querySnapshot.docs.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Invalid email, password, or role')),
@@ -53,11 +51,9 @@ class _LoginPageState extends State<LoginPage> {
         final userDoc = querySnapshot.docs.first;
         final userData = userDoc.data();
         final userId = userDoc.id;
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful')),
         );
-
         if (userData['role'] == 'Admin') {
           Navigator.push(
             context,
@@ -87,8 +83,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

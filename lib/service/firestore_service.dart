@@ -2,9 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   // ------------------ USERS ------------------
-
   Future<void> createUser(Map<String, dynamic> userData) async {
     try {
       await _firestore.collection('users').add(userData);
@@ -12,7 +10,6 @@ class FirestoreService {
       throw Exception('Error creating user: $e');
     }
   }
-
   Future<void> userLogin(String email, String password, String role) async {
     try {
       final querySnapshot = await _firestore
@@ -21,18 +18,15 @@ class FirestoreService {
           .where('password', isEqualTo: password)
           .where('role', isEqualTo: role)
           .get();
-
       if (querySnapshot.docs.isEmpty) {
         throw Exception('No user found with the provided email, password, and role.');
       }
-
       final userData = querySnapshot.docs.first.data();
       print('User logged in successfully: $userData');
     } catch (e) {
       throw Exception('Error logging in user: $e');
     }
   }
-
   Future<List<Map<String, dynamic>>> readUsers() async {
     try {
       final snapshot = await _firestore
@@ -45,7 +39,6 @@ class FirestoreService {
       throw Exception('Error reading users: $e');
     }
   }
-
   Future<List<Map<String, dynamic>>> readAllUsers() async {
     try {
       final snapshot = await _firestore.collection('users').get();
@@ -54,11 +47,10 @@ class FirestoreService {
       throw Exception('Error reading all users: $e');
     }
   }
-
   Future<Map<String, dynamic>?> readUserById(String userId) async {
     try {
       final doc = await _firestore.collection('users').doc(userId).get();
-      if (doc.exists) {
+      if (doc.exists) {   
         final data = doc.data() as Map<String, dynamic>;
         data['id'] = doc.id;
         return data;

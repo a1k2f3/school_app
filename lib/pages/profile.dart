@@ -12,7 +12,7 @@ import 'package:school_app/pages/timetable.dart';
 
 class Profile extends StatefulWidget {
   final Map<String, dynamic> studentData;
-  final String userId;
+  final String userId; 
 
   const Profile({super.key, required this.studentData, required this.userId});
 
@@ -151,7 +151,7 @@ class _ProfileState extends State<Profile> {
                   buildNavigationListTile(context, Icons.school, Colors.black, "Grades & Results", StudentResultPage()),
                   buildNavigationListTile(context, Icons.access_time, Colors.black, "Timetable", Timetable()),
                   buildNavigationListTile(context, Icons.book, Colors.black, "Courses & Subjects", CoursePage()),
-                  buildNavigationListTile(context, Icons.payment, Colors.black, "Fee Status", FeeStatusComponent()),
+                  buildNavigationListTile(context, Icons.payment, Colors.black, "Fee Status", FeeStatusComponent(studentData: widget.studentData, userId: widget.userId)),
                   buildNavigationListTile(context, Icons.assignment, Colors.black, "Dairy", AssignmentsPage()),
                   const Divider(),
                   buildNavigationListTile(context, Icons.settings, Colors.black, "Settings", Setting(studentData: widget.studentData, userId: widget.userId)),
